@@ -30,15 +30,19 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - name: Install the i386 MinGW compiler and p7zip
-        run: sudo apt-get update -q && sudo apt-get install -yq gcc-mingw-w64-i686 p7zip-full
+      - name: Install the MinGW compilers and p7zip
+        run: sudo apt-get update -q && sudo apt-get install -yq gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 p7zip-full
       - name: Build the benchmark programs
         run: benchmarks/build.sh out
       - name: Check what was built
         run: |
-          for f in 7za.exe 7za-License.txt nb-x87.exe NNET.DAT COM.DAT pi-x87.exe; do
+          for f in 7za.exe 7za-x64.exe 7za-License.txt nb-x87.exe nb-x64.exe NNET.DAT COM.DAT \
+                   pi-x87.exe pi-x64.exe; do
             test -s "out/$f" || { echo "missing out/$f"; exit 1; }
           done
           for f in nb-x87.exe pi-x87.exe; do
             file "out/$f" | grep -q "PE32 executable.*Intel 80386" || { file "out/$f"; exit 1; }
+          done
+          for f in nb-x64.exe pi-x64.exe 7za-x64.exe; do
+            file "out/$f" | grep -q "PE32+ executable.*x86-64" || { file "out/$f"; exit 1; }
           done

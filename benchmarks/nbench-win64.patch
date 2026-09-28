@@ -1,0 +1,97 @@
+--- a/nbench0.h
++++ b/nbench0.h
+@@ -219,7 +219,7 @@
+ ** Following global is the memory array.  This is used to store
+ ** original and aligned (modified) memory addresses.
+ */
+-ulong mem_array[2][MEM_ARRAY_SIZE];
++uintptr_t mem_array[2][MEM_ARRAY_SIZE];
+ int mem_array_ents;		/* # of active entries */
+ 
+ /*
+--- a/sysspec.c
++++ b/sysspec.c
+@@ -119,8 +119,8 @@
+ ** a 4-byte entity.
+ */
+ farvoid *returnval;             /* Return value */
+-ulong true_addr;		/* True address */
+-ulong adj_addr;			/* Adjusted address */
++uintptr_t true_addr;		/* True address */
++uintptr_t adj_addr;			/* Adjusted address */
+ 
+ returnval=(farvoid *)malloc((size_t)(nbytes+2L*(long)global_align));
+ if(returnval==(farvoid *)NULL)
+@@ -131,7 +131,7 @@
+ /*
+ ** Check for alignment
+ */
+-adj_addr=true_addr=(ulong)returnval;
++adj_addr=true_addr=(uintptr_t)returnval;
+ if(global_align==0)
+ {	
+ 	if(AddMemArray(true_addr, adj_addr))
+@@ -217,10 +217,10 @@
+ #endif
+ 
+ #ifdef MALLOCMEM
+-ulong adj_addr, true_addr;
++uintptr_t adj_addr, true_addr;
+ 
+ /* Locate item in memory array */
+-adj_addr=(ulong)mempointer;
++adj_addr=(uintptr_t)mempointer;
+ if(RemoveMemArray(adj_addr, &true_addr))
+ {	*errorcode=ERROR_MEMARRAY_NFOUND;
+ 	return;
+@@ -373,8 +373,8 @@
+ ** Returns 0 if ok
+ ** -1 if not enough room
+ */
+-int AddMemArray(ulong true_addr,
+-		ulong adj_addr)
++int AddMemArray(uintptr_t true_addr,
++		uintptr_t adj_addr)
+ {
+ if(mem_array_ents>=MEM_ARRAY_SIZE)
+ 	return(-1);
+@@ -393,7 +393,7 @@
+ ** Returns 0 if ok
+ ** -1 if not found.
+ */
+-int RemoveMemArray(ulong adj_addr,ulong *true_addr)
++int RemoveMemArray(uintptr_t adj_addr,uintptr_t *true_addr)
+ {
+ int i,j;
+ 
+--- a/sysspec.h
++++ b/sysspec.h
+@@ -26,6 +26,7 @@
+ /*
+ ** Standard includes
+ */
++#include <stdint.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <time.h>
+@@ -80,7 +81,7 @@
+ /**************
+ ** EXTERNALS **
+ **************/
+-extern ulong mem_array[2][MEM_ARRAY_SIZE];
++extern uintptr_t mem_array[2][MEM_ARRAY_SIZE];
+ extern int mem_array_ents;
+ extern int global_align;
+ 
+@@ -106,9 +107,9 @@
+ 
+ void InitMemArray(void);
+ 
+-int AddMemArray(ulong true_addr, ulong adj_addr);
++int AddMemArray(uintptr_t true_addr, uintptr_t adj_addr);
+ 
+-int RemoveMemArray(ulong adj_addr,ulong *true_addr);
++int RemoveMemArray(uintptr_t adj_addr,uintptr_t *true_addr);
+ 
+ void ReportError(char *context, int errorcode);
+ 

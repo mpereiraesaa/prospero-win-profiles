@@ -16,9 +16,15 @@ benchmark programs from their pinned upstream sources.
 | `sevenzip-bench` | 7-Zip 25.01 benchmark, `7za b -mmt1 -md22` | PE32 | 2026-09-28: 3361–3369 total MIPS |
 | `nbench-x87` | nbench (BYTEmark 2.2.3), x87 build | PE32 | 2026-09-28: all ten tests; integer index 166.7, FP index 81.6 |
 | `pi-x87` | Ooura's `pi_fftca`, 4.2M digits, x87 build | PE32 | 2026-09-28: 13 s, digits written to `pi.dat` |
+| `sevenzip-bench-x64` | The same 7-Zip package's x64 `7za.exe` | PE64 | 2026-09-28: 5148–5154 total MIPS |
+| `nbench-x64` | nbench, x64 build | PE64 | 2026-09-28: integer index 185.5, FP index 114.9 |
+| `pi-x64` | `pi_fftca`, x64 build | PE64 | 2026-09-28: 8 s, same digits |
 
-The benchmarks measure prospero-win's i386 translator; its benchmark page
-compares them with native runs. Their output arrives in the title's ps5log
+The PE32 benchmarks measure prospero-win's i386 translator (DBT). The PE64
+builds of the same programs run natively on the console, so they are the
+baseline: on the host, where both builds run natively, the x64 builds are
+1.03–1.36× faster than the i386 ones, and correcting for that puts the DBT
+at about 85–93% of native speed on the console. Their output arrives in the title's ps5log
 stream as `STDOUT` lines, and each program exits by itself, which returns
 the title to the launcher.
 
@@ -37,8 +43,8 @@ The library lives in `/data/prospero-win` on the console:
    the launcher's order; if you already have one, add these names to it
    instead of replacing it.
 2. For the benchmarks, run `benchmarks/build.sh out` (it needs curl, tar,
-   patch, `7z` and `i686-w64-mingw32-gcc`) and copy everything in `out/`
-   except `.cache` to `prefix/drive_c/Tools`.
+   patch, `7z`, `i686-w64-mingw32-gcc` and `x86_64-w64-mingw32-gcc`) and
+   copy everything in `out/` except `.cache` to `prefix/drive_c/Tools`.
 3. For Pinball, copy your installed game to `prefix/drive_c/Games/Pinball`.
 
 ## Benchmark sources
@@ -48,13 +54,16 @@ The library lives in `/data/prospero-win` on the console:
 - 7-Zip 25.01 "extra" (`7z2501-extra.7z`) from 7-zip.org: the i386
   `7za.exe`, with its `License.txt` (LGPL with the unRAR restriction).
 - nbench-byte 2.2.3 from the University of Utah mirror, built with
-  `-O2`.
+  `-O2`. The x64 build also applies `benchmarks/nbench-win64.patch`:
+  nbench keeps allocation addresses in a `ulong`, which is 32 bits on
+  Win64, so the patch makes them `uintptr_t`.
 - Takuya Ooura's `pi_fftc6_src.tgz`, with `benchmarks/pi_fftca-args.patch`
   applied: the FFT length comes from the command line instead of standard
   input, and a failed `fopen` of `pi.dat` is reported. Built with
   `-O2 -ffast-math`.
 
-The x87 builds are what engines of the early 2000s used. SSE2 builds
+The i386 builds use x87, as engines of the early 2000s did; the x64
+builds use SSE2, as every x64 compiler does. i386 SSE2 builds
 (`-msse2 -mfpmath=sse`) run on the host but have not been checked on the
 console yet, so they have no profiles here.
 
