@@ -16,7 +16,8 @@ from pathlib import Path
 MAX_BYTES = 8192
 CATALOG_MAX = 16
 NAME_MAX = 64            # profile file names, including ".profile"
-ID_CAP, NAME_CAP, PATH_CAP, ARGS_CAP = 65, 97, 260, 513
+ID_CAP, NAME_CAP, PATH_CAP, ARGS_CAP, OVERRIDES_CAP = 65, 97, 260, 513, 257
+DLL_OVERRIDES = re.compile(r"[A-Za-z0-9,=;._*-]+\Z")
 BUTTONS = ("cross circle square triangle l1 r1 l2 r2 l3 r3 up down left right "
            "options create touchpad").split()
 KEYS = set(("space enter escape tab backspace shift ctrl alt pause pageup pagedown end home "
@@ -82,6 +83,10 @@ def application(fields, key, value):
         fields[key] = text_value(key, value, caps[key])
     elif key == "arguments":
         fields[key] = text_value(key, value, ARGS_CAP, allow_empty=True)
+    elif key == "dll_overrides":
+        fields[key] = text_value(key, value, OVERRIDES_CAP)
+        if not DLL_OVERRIDES.match(value):
+            raise Refused("dll_overrides: only DLL names, ',', '=', ';', '.', '_', '-' and '*'")
     elif key == "startup_command_id":
         if not value.isdigit() or not value.isascii() or int(value) > 0xFFFF:
             raise Refused("startup_command_id: not a number up to 65535")
