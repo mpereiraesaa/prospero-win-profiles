@@ -58,6 +58,15 @@ The x87 builds are what engines of the early 2000s used. SSE2 builds
 (`-msse2 -mfpmath=sse`) run on the host but have not been checked on the
 console yet, so they have no profiles here.
 
+## Checks
+
+`tools/check_profiles.py` reads every profile, preset and `profiles.lst`
+by the rules of prospero-win's own parsers, so a file the title would
+refuse fails here first. It also checks that each profile's `id` is its
+file name, that its preset exists and that `profiles.lst` lists every
+profile. CI runs it with its tests on every change, and builds the
+benchmark programs weekly to catch a source that has moved.
+
 ## License
 
 The profiles, presets, patch and script are MIT-licensed ([LICENSE](LICENSE)).
