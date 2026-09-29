@@ -39,6 +39,11 @@ script:
       executable: drive_c/windows/syswow64/regsvr32.exe
       args: /s "C:\\Program Files (x86)\\Warcraft III\\blizzard.ax"
       prefix: $GAMEDIR
+  # The movies' AVI splitter and decoders. Wine's own splitters are
+  # GStreamer's, which the console's Wine is built without; LAV Filters are
+  # Windows DirectShow filters and run there like the game. Measured on the
+  # PC with GStreamer disabled: the intro plays, picture and sound.
+  - task: {name: winetricks, app: lavfilters, prefix: $GAMEDIR}
   - task:
       name: set_regedit
       path: HKEY_CURRENT_USER\Software\Blizzard Entertainment\Warcraft III\Video
