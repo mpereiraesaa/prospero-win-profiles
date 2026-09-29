@@ -165,13 +165,25 @@ def check_size(data):
         raise Refused(f"larger than {MAX_BYTES} bytes")
 
 
+WINEDEBUG = re.compile(r"^[A-Za-z0-9_+\-,=.]{1,127}$")
+
+
+def debug_line(seen, key, value):
+    """[debug]: winedebug, once, a Wine channel list and nothing else."""
+    if key != "winedebug" or key in seen:
+        raise Refused(f"[debug] {key} unknown or repeated")
+    if not WINEDEBUG.match(value):
+        raise Refused(f"winedebug {value!r} is not a channel list")
+    seen.add(key)
+
+
 def parse_profile(data):
     """The profile's [application] fields and its preset name ('' if none)."""
     check_size(data)
-    section, sections, fields, seen_display, seen_input = None, [], {}, set(), set()
+    section, sections, fields, seen_display, seen_input, seen_debug = None, [], {}, set(), set(), set()
     for name, key, value in lines(data):
         if key is None:
-            if name not in ("application", "display", "input") or name in sections:
+            if name not in ("application", "display", "input", "debug") or name in sections:
                 raise Refused(f"section [{name}] unknown or repeated")
             if (not sections) != (name == "application"):
                 raise Refused("[application] must come first")
@@ -183,6 +195,8 @@ def parse_profile(data):
             application(fields, key, value)
         elif section == "display":
             display_line(seen_display, key, value)
+        elif section == "debug":
+            debug_line(seen_debug, key, value)
         else:
             input_line(seen_input, key, value, allow_preset=True)
     if "application" not in sections:

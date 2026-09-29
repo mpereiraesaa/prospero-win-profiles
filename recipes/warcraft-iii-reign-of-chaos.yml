@@ -1,0 +1,53 @@
+# Warcraft III: Reign of Chaos 1.27a for Prospero Win, in Lutris's installer
+# format. Adapted from the lutris.net "Digital 1.27" script: the same
+# Blizzard installer (your own copy; it asks for your CD key in its window,
+# and shows its license in an Internet Explorer control, hence Gecko), but
+# Direct3D 9 (1.27a's renderer) through DXVK instead of -opengl, since the
+# console has no OpenGL.
+name: "Warcraft III: Reign of Chaos"
+game_slug: warcraft-iii-reign-of-chaos
+version: Installer 1.27a (Prospero Win)
+slug: warcraft-iii-reign-of-chaos-prospero-win
+runner: wine
+prospero:
+  name: Warcraft III
+  display: {desktop: 1920x1080, scaling: fit}
+  input: {preset: mouse}
+script:
+  game:
+    # War3.exe itself: "Warcraft III.exe" only starts it as a second process,
+    # which Wine on the console does not do.
+    exe: drive_c/Program Files (x86)/Warcraft III/War3.exe
+    prefix: $GAMEDIR
+  files:
+  - installer: "N/A:Select Installer.exe in your Warcraft III Reign of Chaos 1.27a installer folder"
+  wine:
+    dxvk: true
+    dxvk_version: "2.6.2"
+  installer:
+  - task: {name: create_prefix, prefix: $GAMEDIR, arch: win32, install_gecko: true}
+  - task:
+      name: wineexec
+      executable: installer
+      prefix: $GAMEDIR
+      return_code: "0,25856"
+      description: "Follow the installer: enter your CD key, keep the default folder, and close it when it finishes."
+  # The cinematics' DirectShow decoder: black videos without it. 32-bit, so
+  # the 32-bit regsvr32.
+  - task:
+      name: wineexec
+      executable: drive_c/windows/syswow64/regsvr32.exe
+      args: /s "C:\\Program Files (x86)\\Warcraft III\\blizzard.ax"
+      prefix: $GAMEDIR
+  - task:
+      name: set_regedit
+      path: HKEY_CURRENT_USER\Software\Blizzard Entertainment\Warcraft III\Video
+      key: reswidth
+      value: $RESOLUTION_WIDTH
+      type: REG_DWORD
+  - task:
+      name: set_regedit
+      path: HKEY_CURRENT_USER\Software\Blizzard Entertainment\Warcraft III\Video
+      key: resheight
+      value: $RESOLUTION_HEIGHT
+      type: REG_DWORD

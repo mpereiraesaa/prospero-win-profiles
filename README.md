@@ -13,6 +13,7 @@ benchmark programs from their pinned upstream sources.
 |---|---|---|---|
 | `minesweeper` | Wine's Minesweeper (ships with the prefix) | PE64 | Played with the stick-driven pointer |
 | `pinball` | Space Cadet Pinball (your own copy, in `C:\Games\Pinball`) | PE32 | Played full-screen with the DualSense |
+| `warcraft-iii-reign-of-chaos` | Warcraft III: Reign of Chaos 1.27a (your own copy and CD key; installed from `recipes/`) | PE32, Direct3D 9 | 2026-09-29: reaches the main menu on RADV, DXVK 2.6.2; controls, cinematics and performance not yet checked |
 | `sevenzip-bench` | 7-Zip 25.01 benchmark, `7za b -mmt1 -md22` | PE32 | 2026-09-28: 3361–3369 total MIPS |
 | `nbench-x87` | nbench (BYTEmark 2.2.3), x87 build | PE32 | 2026-09-28: all ten tests; integer index 166.7, FP index 81.6 |
 | `pi-x87` | Ooura's `pi_fftca`, 4.2M digits, x87 build | PE32 | 2026-09-28: 13 s, digits written to `pi.dat` |
@@ -46,6 +47,30 @@ The library lives in `/data/prospero-win` on the console:
    patch, `7z`, `i686-w64-mingw32-gcc` and `x86_64-w64-mingw32-gcc`) and
    copy everything in `out/` except `.cache` to `prefix/drive_c/Tools`.
 3. For Pinball, copy your installed game to `prefix/drive_c/Games/Pinball`.
+
+## Recipes
+
+Games with an installer are installed on the PC and played on the PS5
+(prospero-win's
+[docs/INSTALLING_GAMES.md](https://github.com/mpereiraesaa/prospero-win/blob/main/docs/INSTALLING_GAMES.md)).
+A recipe is a [Lutris installer
+script](https://github.com/lutris/lutris/blob/master/docs/installers.rst),
+adapted from lutris.net where one exists, with a `prospero` block for the
+console's display and input. It holds no game files and no keys: you give
+your installer, and type your key in its window.
+
+```sh
+# in prospero-win
+python3 tools/pw_install.py ../prospero-win-profiles/recipes/warcraft-iii-reign-of-chaos.yml \
+    --library ~/prospero-library --wine <host wine>/usr/bin/wine \
+    --file installer=/path/to/War3-ROC-1.27a-Installer/Installer.exe
+python3 tools/pw_prefix.py push warcraft-iii-reign-of-chaos --library ~/prospero-library \
+    --host <PS5 IP> --cpu-dll <build>/dlls/wowprospero/x86_64-windows/wowprospero.dll
+```
+
+| Recipe | Notes |
+|---|---|
+| `warcraft-iii-reign-of-chaos` | Blizzard's 1.27a installer (it shows its license through Wine Gecko); registers `blizzard.ax` for the cinematics; Direct3D 9 through DXVK instead of lutris.net's `-opengl`, since the console has no OpenGL; resolution from `--resolution` |
 
 ## Benchmark sources
 
