@@ -13,7 +13,7 @@ benchmark programs from their pinned upstream sources.
 |---|---|---|---|
 | `minesweeper` | Wine's Minesweeper (ships with the prefix) | PE64 | Played with the stick-driven pointer |
 | `pinball` | Space Cadet Pinball (your own copy, in `C:\Games\Pinball`) | PE32 | Played full-screen with the DualSense |
-| `warcraft-iii-reign-of-chaos` | Warcraft III: Reign of Chaos 1.27a (your own copy and CD key; installed from `recipes/`) | PE32, Direct3D 9 | 2026-09-29: reaches the main menu on RADV, DXVK 2.6.2; controls, cinematics and performance not yet checked |
+| `warcraft-iii-reign-of-chaos` | Warcraft III: Reign of Chaos 1.27a (your own copy and CD key; installed from `recipes/`) | PE32, Direct3D 9 | 2026-09-29: plays on RADV, DXVK 2.6.2 (menu, skirmish, cinematics with sound, centred); DualSense (`warcraft3` preset) or USB keyboard and mouse; performance not yet measured |
 | `sevenzip-bench` | 7-Zip 25.01 benchmark, `7za b -mmt1 -md22` | PE32 | 2026-09-28: 3361–3369 total MIPS |
 | `nbench-x87` | nbench (BYTEmark 2.2.3), x87 build | PE32 | 2026-09-28: all ten tests; integer index 166.7, FP index 81.6 |
 | `pi-x87` | Ooura's `pi_fftca`, 4.2M digits, x87 build | PE32 | 2026-09-28: 13 s, digits written to `pi.dat` |
@@ -70,7 +70,7 @@ python3 tools/pw_prefix.py push warcraft-iii-reign-of-chaos --library ~/prospero
 
 | Recipe | Notes |
 |---|---|
-| `warcraft-iii-reign-of-chaos` | Blizzard's 1.27a installer (it shows its license through Wine Gecko); registers `blizzard.ax` for the cinematics; Direct3D 9 through DXVK instead of lutris.net's `-opengl`, since the console has no OpenGL; resolution from `--resolution` |
+| `warcraft-iii-reign-of-chaos` | Blizzard's 1.27a installer (it shows its license through Wine Gecko); registers `blizzard.ax`, and LAV Filters (`winetricks lavfilters`) for the cinematics, since the console's Wine has no GStreamer; RenderEdge_Widescreen (pinned by SHA-256) for 16:9; Direct3D 9 through DXVK instead of lutris.net's `-opengl`, since the console has no OpenGL; 1920x1080, the console desktop's size |
 
 ## Benchmark sources
 

@@ -18,4 +18,4 @@ desktop = 1920x1080
 scaling = fit
 
 [input]
-preset = mouse
+preset = warcraft3

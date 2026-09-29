@@ -12,7 +12,7 @@ runner: wine
 prospero:
   name: Warcraft III
   display: {desktop: 1920x1080, scaling: fit}
-  input: {preset: mouse}
+  input: {preset: warcraft3}
 script:
   game:
     # War3.exe itself: "Warcraft III.exe" only starts it as a second process,
@@ -21,6 +21,14 @@ script:
     prefix: $GAMEDIR
   files:
   - installer: "N/A:Select Installer.exe in your Warcraft III Reign of Chaos 1.27a installer folder"
+  # ENAleksey's RenderEdge_Widescreen (1.23a-1.28.5): 1.27a's 3D view is
+  # 4:3 stretched to the screen without it. The game loads .mix files from
+  # its folder as plugins. No licence, so it is downloaded, not shipped, and
+  # pinned to the release's bytes.
+  - renderedge:
+      url: https://github.com/ENAleksey/RenderEdge_Widescreen/releases/download/v1.2.0c/RenderEdge_Widescreen.mix
+      filename: RenderEdge_Widescreen.mix
+      sha256: 2b3b5b0a1006f1793676243b712527ba443dada9ac5c8c9722d3bb73e859cda6
   wine:
     dxvk: true
     dxvk_version: "2.6.2"
@@ -44,15 +52,19 @@ script:
   # Windows DirectShow filters and run there like the game. Measured on the
   # PC with GStreamer disabled: the intro plays, picture and sound.
   - task: {name: winetricks, app: lavfilters, prefix: $GAMEDIR}
+  - copy: {src: renderedge, dst: "$GAMEDIR/drive_c/Program Files (x86)/Warcraft III"}
+  # The console's desktop size (prospero.display), not the PC's: the
+  # swapchain has to be a size VideoOut accepts (1440x1080 is refused), and
+  # RenderEdge makes 16:9 right. The 800x600 cinematics are scaled and centred.
   - task:
       name: set_regedit
       path: HKEY_CURRENT_USER\Software\Blizzard Entertainment\Warcraft III\Video
       key: reswidth
-      value: $RESOLUTION_WIDTH
+      value: 1920
       type: REG_DWORD
   - task:
       name: set_regedit
       path: HKEY_CURRENT_USER\Software\Blizzard Entertainment\Warcraft III\Video
       key: resheight
-      value: $RESOLUTION_HEIGHT
+      value: 1080
       type: REG_DWORD

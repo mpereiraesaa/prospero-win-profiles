@@ -1,0 +1,24 @@
+; Warcraft III on the DualSense: the left stick moves the pointer, Cross and
+; R2 select, Circle and L2 command, the d-pad scrolls the camera, and the
+; face and shoulder buttons are the commonest hotkeys.
+[input]
+mode = keyboard
+mouse = left_stick
+mouse_speed = 1200
+cross = mouse_left
+r2 = mouse_left
+circle = mouse_right
+l2 = mouse_right
+square = a
+triangle = s
+r1 = tab
+l1 = alt
+up = up
+down = down
+left = left
+right = right
+options = f10
+create = escape
+l3 = f1
+r3 = backspace
+touchpad = space
