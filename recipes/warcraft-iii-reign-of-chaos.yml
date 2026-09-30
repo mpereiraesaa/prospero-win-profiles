@@ -53,11 +53,12 @@ script:
   # PC with GStreamer disabled: the intro plays, picture and sound.
   - task: {name: winetricks, app: lavfilters, prefix: $GAMEDIR}
   # LAV Video with one decoding thread and no hardware decoding. On the
-  # console, each thread LAV starts can wait seconds before it runs (cause
-  # still open: prospero-win issue #250), and the intro
-  # waited 9 s on average, up to 30 s, before its first frame; with both
-  # settings, 1.6 s (measured, 4 launches). The 800x600 movies still play at
-  # 24 fps on one thread, and DXVK has no DXVA2 to decode with anyway.
+  # console the intro waits a random 0.4-32 s before its first frame, while
+  # new threads start (prospero-win issue #250, cause still open). These
+  # settings seemed to shorten it (1.6 s over 4 test launches), but a later
+  # launch with them still waited 17 s: they do not reliably help. Kept
+  # because they cost nothing: the 800x600 movies play at 24 fps on one
+  # thread, and DXVK has no DXVA2 to decode with anyway.
   - task:
       name: set_regedit
       path: HKEY_CURRENT_USER\Software\LAV\Video
