@@ -52,6 +52,24 @@ script:
   # Windows DirectShow filters and run there like the game. Measured on the
   # PC with GStreamer disabled: the intro plays, picture and sound.
   - task: {name: winetricks, app: lavfilters, prefix: $GAMEDIR}
+  # LAV Video with one decoding thread and no hardware decoding. On the
+  # console, each thread LAV starts can wait seconds before it runs (cause
+  # still open: prospero-win issue #250), and the intro
+  # waited 9 s on average, up to 30 s, before its first frame; with both
+  # settings, 1.6 s (measured, 4 launches). The 800x600 movies still play at
+  # 24 fps on one thread, and DXVK has no DXVA2 to decode with anyway.
+  - task:
+      name: set_regedit
+      path: HKEY_CURRENT_USER\Software\LAV\Video
+      key: NumThreads
+      value: 1
+      type: REG_DWORD
+  - task:
+      name: set_regedit
+      path: HKEY_CURRENT_USER\Software\LAV\Video
+      key: HWAccel
+      value: 0
+      type: REG_DWORD
   - copy: {src: renderedge, dst: "$GAMEDIR/drive_c/Program Files (x86)/Warcraft III"}
   # The console's desktop size (prospero.display), not the PC's: the
   # swapchain has to be a size VideoOut accepts (1440x1080 is refused), and
