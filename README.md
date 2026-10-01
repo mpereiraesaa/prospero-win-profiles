@@ -16,6 +16,7 @@ benchmark programs from their pinned upstream sources.
 | `warcraft-iii-reign-of-chaos` | Warcraft III: Reign of Chaos 1.27a (your own copy and CD key; installed from `recipes/`) | PE32, Direct3D 9 | 2026-09-29: plays on RADV, DXVK 2.6.2 (menu, skirmish, cinematics with sound, centred); DualSense (`warcraft3` preset) or USB keyboard and mouse; performance not yet measured |
 | `openarena-088` | OpenArena 0.8.8 official Windows build (your copy in `C:\Games\OpenArena`) | PE32, OpenGL | 2026-10-01: `GL_RENDERER: PS5 AGC`, `aggressor` bot match; no GPU present failure or rejected draw; USB keyboard and mouse for input |
 | `half-life` | Half-Life 1 (your own copy in `C:\Games\HalfLife`) | PE32, OpenGL | 2026-10-01: `c1a0` scene and audio on the PS5; USB keyboard and mouse for input |
+| `counter-strike-16` | Counter-Strike 1.6 (your own copy in `C:\Games\CounterStrike16`, plus winetricks `corefonts`; see the profile's comments) | PE32, OpenGL | 2026-10-01: main menu at 1920x1080 with the core fonts, 60 fps with vsync; USB keyboard and mouse |
 | `sevenzip-bench` | 7-Zip 25.01 benchmark, `7za b -mmt1 -md22` | PE32 | 2026-09-28: 3361–3369 total MIPS |
 | `nbench-x87` | nbench (BYTEmark 2.2.3), x87 build | PE32 | 2026-09-28: all ten tests; integer index 166.7, FP index 81.6 |
 | `pi-x87` | Ooura's `pi_fftca`, 4.2M digits, x87 build | PE32 | 2026-09-28: 13 s, digits written to `pi.dat` |
