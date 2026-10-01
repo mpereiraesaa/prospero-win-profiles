@@ -154,6 +154,9 @@ def display_line(seen, key, value):
     elif key == "view":
         if value.lower() not in ("window", "desktop"):
             raise Refused(f"view {value!r}")
+    elif key == "show_fps":
+        if value.lower() not in ("true", "false"):
+            raise Refused(f"show_fps {value!r}")
     else:
         raise Refused(f"unknown [display] key {key!r}")
 

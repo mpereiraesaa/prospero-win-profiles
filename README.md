@@ -2,8 +2,8 @@
 
 Game and benchmark profiles for
 [prospero-win](https://github.com/mpereiraesaa/prospero-win), the Windows
-compatibility runtime for PS5 homebrew. Each profile here has been run on a
-PS5; the table says what was checked. No Windows programs or game files are
+compatibility runtime for PS5 homebrew. The configurations here have been run
+on a PS5; the table says what was checked. No Windows programs or game files are
 included: games are your own copies, and `benchmarks/build.sh` builds the
 benchmark programs from their pinned upstream sources.
 
@@ -14,6 +14,8 @@ benchmark programs from their pinned upstream sources.
 | `minesweeper` | Wine's Minesweeper (ships with the prefix) | PE64 | Played with the stick-driven pointer |
 | `pinball` | Space Cadet Pinball (your own copy, in `C:\Games\Pinball`) | PE32 | Played full-screen with the DualSense |
 | `warcraft-iii-reign-of-chaos` | Warcraft III: Reign of Chaos 1.27a (your own copy and CD key; installed from `recipes/`) | PE32, Direct3D 9 | 2026-09-29: plays on RADV, DXVK 2.6.2 (menu, skirmish, cinematics with sound, centred); DualSense (`warcraft3` preset) or USB keyboard and mouse; performance not yet measured |
+| `openarena-088` | OpenArena 0.8.8 official Windows build (your copy in `C:\Games\OpenArena`) | PE32, OpenGL | 2026-10-01: `GL_RENDERER: PS5 AGC`, `aggressor` bot match; no GPU present failure or rejected draw; USB keyboard and mouse for input |
+| `half-life` | Half-Life 1 (your own copy in `C:\Games\HalfLife`) | PE32, OpenGL | 2026-10-01: `c1a0` scene and audio on the PS5; USB keyboard and mouse for input |
 | `sevenzip-bench` | 7-Zip 25.01 benchmark, `7za b -mmt1 -md22` | PE32 | 2026-09-28: 3361–3369 total MIPS |
 | `nbench-x87` | nbench (BYTEmark 2.2.3), x87 build | PE32 | 2026-09-28: all ten tests; integer index 166.7, FP index 81.6 |
 | `pi-x87` | Ooura's `pi_fftca`, 4.2M digits, x87 build | PE32 | 2026-09-28: 13 s, digits written to `pi.dat` |
@@ -37,9 +39,10 @@ SDK. The runtime forces Wine's builtin `opengl32` for that profile, preserving
 any other per-game DLL overrides. SDK 0.6.0 provides an EGL compatibility
 profile and OpenGL 4.6 Core; Wine's legacy `wglCreateContext` path uses the
 compatibility default so games can call fixed-function APIs. The upstream
-compatibility-context gate covers legacy `QUADS` and related draws, but no
-Windows WGL game has been validated on hardware yet. Half-Life 1, Doom ports
-and other individual games remain unverified.
+compatibility-context gate covers legacy `QUADS` and related draws. OpenArena
+0.8.8 and Half-Life 1 have been validated on the PS5; other games and Doom
+ports still need individual checks. Both OpenGL profiles set `show_fps = true`
+for the backend's small frame-rate counter without the statistics chart.
 
 ## Install
 
@@ -59,6 +62,8 @@ The library lives in `/data/prospero-win` on the console:
    patch, `7z`, `i686-w64-mingw32-gcc` and `x86_64-w64-mingw32-gcc`) and
    copy everything in `out/` except `.cache` to `prefix/drive_c/Tools`.
 3. For Pinball, copy your installed game to `prefix/drive_c/Games/Pinball`.
+4. For OpenArena or Half-Life, copy your own Windows game files to
+   `prefix/drive_c/Games/OpenArena` or `prefix/drive_c/Games/HalfLife`.
 
 ## Recipes
 
