@@ -3,9 +3,16 @@
 ; make it play well on the DualSense.
 ;
 ; How it runs on the PS5 (October 2026): 60 fps in Grove Street and on the
-; road, with the DualSense, intro movies and sound. It needs a prospero-win
-; runtime with #373 (the game's CPU check stops an older one at startup) and
-; #374 (without it, Framerate Vigilante drops the game to about 15 fps).
+; road, with the DualSense, intro movies and sound. With every mod below,
+; Proper Shaders included on its lightest preset, a drive around Los Santos
+; averaged 59.3 fps, 89% of frames at 59 or better. Proper Shaders' medium
+; preset averages about 33 fps, so stay on preset 0 for now.
+;
+; It needs a prospero-win runtime with #373 (the game's CPU check stops an
+; older one at startup) and #374 (without it, Framerate Vigilante drops the
+; game to about 15 fps). CLEO and Mod Loader also need #380, #382 and #385
+; (CLEO's scripts patch the game's code while it runs), and Proper Shaders
+; needs #387.
 ;
 ; Setting it up (recipes/gta-san-andreas.yml in prospero-win-profiles does
 ; all of it):
@@ -28,11 +35,20 @@
 ;   - Widescreen Fix: a 16:9 HUD and menus, and the game starts at the
 ;     screen's 1920x1080 instead of 800x600. Widescreen Frontend adds 16:9
 ;     loading screens.
-;   - Open Limit Adjuster, which bigger mods need.
+;   - Open Limit Adjuster, which bigger mods need. Set Coronas = 1000,
+;     StaticShadows = 256 and ScriptSearchLights = 32 under [SALIMITS]: the
+;     game walks those arrays every frame, and the ini's huge defaults cost
+;     frames for nothing.
 ;   - Framerate Vigilante: the game was made for 30 fps, and at 60 some
 ;     physics and missions misbehave; this fixes most of it. It's only on
 ;     MixMods (mixmods.com.br), so download it there. Keep the game's own
-;     frame limiter on (the default), as it asks.
+;     frame limiter on (Display Setup > Frame Limiter), as it asks.
+;   - CLEO 4, for CLEO script mods, and Mod Loader, which installs other
+;     mods from its modloader folder without touching the game's files.
+;   - Proper Shaders (MixMods, "SA - Proper Shaders"; no reuploads allowed,
+;     so download it there): its plugin and ini in scripts, its resources
+;     folder and .json files next to gta_sa.exe. Use preset 0 with Map = 1
+;     in ProperShaders.ini; preset 0 with Map = 0 crashed on the PC.
 ;
 ; The game keeps its settings and saves in
 ; C:\users\prospero\Documents\GTA San Andreas User Files.

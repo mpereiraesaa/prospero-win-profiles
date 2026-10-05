@@ -1,7 +1,8 @@
 # Grand Theft Auto: San Andreas (PC version 1.0) for Prospero Win, in
 # Lutris's installer format. Tested on the PS5: 60 fps at 1920x1080 with the
 # DualSense (see profiles/gta-san-andreas.profile), on a prospero-win runtime
-# with #373 and #374.
+# with #373 and #374; CLEO and Mod Loader also need #380, #382 and #385, and
+# Proper Shaders #387.
 #
 # There is no installer to run: the game comes from your own installed copy.
 # Give the recipe the folder that holds gta_sa.exe; it is copied into
@@ -27,7 +28,21 @@
 # - The Widescreen Frontend replaces the loading screens (models/txd/
 #   LOADSCS.txd) with 16:9 ones.
 # - The Open Limit Adjuster raises the game's object and streaming limits,
-#   which larger mods need.
+#   which larger mods need. Three of its limits are arrays the game walks
+#   every frame, so the recipe sets them to what mods use rather than the
+#   ini's very large defaults: Coronas 1000 (vanilla 64), StaticShadows 256
+#   (vanilla 48), ScriptSearchLights 32 (vanilla 8).
+# - CLEO 4 runs CLEO scripts, which many gameplay mods are.
+# - Mod Loader installs other mods from its modloader folder without
+#   touching the game's files.
+# - Proper Shaders (Junior_Djjr, MixMods) adds SMAA, bloom, sun rays and
+#   soft particles on its lightest preset, or deferred lighting on the
+#   others. Its licence doesn't allow reuploads, so download it from MixMods
+#   ("SA - Proper Shaders") and give the zip to the recipe. It is installed
+#   without Mod Loader: its plugin and ini in scripts, its resources folder
+#   and .json files in the game folder, where it looks for them. The recipe
+#   picks preset 0 with the PS2-style lit map (Map = 1); preset 0 as shipped
+#   (Map = 0) crashed on the PC.
 # The Ultimate ASI Loader loads them: it takes the place of vorbisFile.dll,
 # which the game loads at start, and passes the real one's calls on to it
 # under the name vorbisHooked.dll.
@@ -54,6 +69,7 @@ script:
   files:
   - game: "N/A:Select the folder of your installed GTA San Andreas 1.0 (it holds gta_sa.exe)"
   - framerate_vigilante: "N/A:Select Framerate_Vigilante.zip, downloaded from MixMods (the version from 2026-10-01 or later)"
+  - proper_shaders: "N/A:Select the SA - Proper Shaders zip, downloaded from MixMods (the 08-26 build or later)"
   # Third-party mods: downloaded, not shipped, and pinned to the releases'
   # bytes.
   - asiloader:
@@ -75,6 +91,14 @@ script:
       url: https://github.com/ThirteenAG/WidescreenFixesPack/releases/download/gtasa/GTASA.WidescreenFix.zip
       filename: GTASA.WidescreenFix-20261004.zip
       sha256: 563078bfae5ad93be548d9378d4a97809762fb3a8dfdf0ef65e6023beadeb3ae
+  - cleo:
+      url: https://github.com/cleolibrary/CLEO4/releases/download/v4.4.4/CLEO4.zip
+      filename: CLEO4-v4.4.4.zip
+      sha256: aca8a1ca9dfc85d6f886b5963388059b2580501219f1f6b891114560552a8560
+  - modloader:
+      url: https://github.com/thelink2012/modloader/releases/download/v0.3.10/modloader.zip
+      filename: modloader-v0.3.10.zip
+      sha256: 3bb0e3d656a55d8c0a7ce98876033e2b9b672e8b7b5596f8044ccaa8f38dc403
   - widescreenfrontend:
       url: https://github.com/ThirteenAG/WidescreenFixesPack/releases/download/gtasa/GTASA.WidescreenFrontend.zip
       filename: GTASA.WidescreenFrontend-20190412.zip
@@ -113,6 +137,31 @@ script:
   - copy: {src: $CACHE/limitadjuster/III.VC.SA.LimitAdjuster.ini, dst: $GAMEDIR/drive_c/Games/GTASA/scripts}
   - extract: {file: framerate_vigilante, dst: $CACHE/framerate_vigilante}
   - copy: {src: "$CACHE/framerate_vigilante/GTA SA/FramerateVigilante", dst: $GAMEDIR/drive_c/Games/GTASA/scripts}
+  # Only those three lines change; the rest of the ini keeps its comments.
+  - execute:
+      command: >-
+        sed -i -e '/^\[SALIMITS\]/,/^\[/{s/^Coronas = [0-9]*/Coronas = 1000/;s/^StaticShadows = [0-9]*/StaticShadows = 256/;s/^ScriptSearchLights = [0-9]*/ScriptSearchLights = 32/}'
+        "$GAMEDIR/drive_c/Games/GTASA/scripts/III.VC.SA.LimitAdjuster.ini"
+  # CLEO: CLEO.asi, bass.dll and the cleo folder in the game folder.
+  - extract: {file: cleo, dst: $CACHE/cleo}
+  - copy: {src: $CACHE/cleo/CLEO.asi, dst: $GAMEDIR/drive_c/Games/GTASA}
+  - copy: {src: $CACHE/cleo/bass.dll, dst: $GAMEDIR/drive_c/Games/GTASA}
+  - copy: {src: $CACHE/cleo/cleo, dst: $GAMEDIR/drive_c/Games/GTASA/cleo}
+  # Mod Loader: modloader.asi and its modloader folder in the game folder.
+  - extract: {file: modloader, dst: $GAMEDIR/drive_c/Games/GTASA}
+  - execute:
+      command: rm -f "$GAMEDIR/drive_c/Games/GTASA/Readme.txt" "$GAMEDIR/drive_c/Games/GTASA/Leia-me.txt"
+  # Proper Shaders without Mod Loader (see above).
+  - extract: {file: proper_shaders, dst: $CACHE/proper_shaders}
+  - copy: {src: "$CACHE/proper_shaders/Proper Shaders/ProperShaders.asi", dst: $GAMEDIR/drive_c/Games/GTASA/scripts}
+  - copy: {src: "$CACHE/proper_shaders/(presets)/(0- only improvements)/ProperShaders.ini", dst: $GAMEDIR/drive_c/Games/GTASA/scripts}
+  - copy: {src: "$CACHE/proper_shaders/Proper Shaders/resources", dst: $GAMEDIR/drive_c/Games/GTASA/resources}
+  - copy: {src: "$CACHE/proper_shaders/Proper Shaders/MaterialsData.json", dst: $GAMEDIR/drive_c/Games/GTASA}
+  - copy: {src: "$CACHE/proper_shaders/Proper Shaders/MapTweaks.json", dst: $GAMEDIR/drive_c/Games/GTASA}
+  - copy: {src: "$CACHE/proper_shaders/Proper Shaders/SoftParticlesSettings.json", dst: $GAMEDIR/drive_c/Games/GTASA}
+  - execute:
+      command: >-
+        sed -i -e 's/^Map = 0 /Map = 1 /' "$GAMEDIR/drive_c/Games/GTASA/scripts/ProperShaders.ini"
   # The button pictures GInput shows in the game's help boxes.
   - copy: {src: $CACHE/ginput/models, dst: $GAMEDIR/drive_c/Games/GTASA/models}
   # PlayStation button prompts (Cross, Circle...) instead of Xbox ones.
