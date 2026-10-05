@@ -49,6 +49,9 @@
 ;     so download it there): its plugin and ini in scripts, its resources
 ;     folder and .json files next to gta_sa.exe. Use preset 0 with Map = 1
 ;     in ProperShaders.ini; preset 0 with Map = 0 crashed on the PC.
+;   - Optional: ShadowEdgeIndex (plugins/sa-shadow-edges in
+;     prospero-win-profiles, built from source) makes the game's realtime
+;     shadows cheaper to build on the main thread, with the same result.
 ;
 ; The game keeps its settings and saves in
 ; C:\users\prospero\Documents\GTA San Andreas User Files.
