@@ -25,6 +25,18 @@ def accepted(parse, text):
 
 
 class ProfileRules(unittest.TestCase):
+    def test_goldsrc_pointer_keeps_controller(self):
+        preset=(ROOT / "input" / "goldsrc.input").read_text()
+        self.assertTrue(accepted(cp.parse_preset,preset))
+        self.assertIn("mode = xinput",preset)
+        self.assertIn("mouse = right_stick",preset)
+        self.assertIn("touchpad = mouse_left",preset)
+        self.assertIn("options = escape",preset)
+        for game in ("half-life","counter-strike-16"):
+            profile=(ROOT / "profiles" / (game+".profile")).read_text()
+            self.assertTrue(accepted(cp.parse_profile,profile))
+            self.assertIn("preset = goldsrc",profile)
+            self.assertIn("graphics = opengl",profile)
     def test_profile_forms(self):
         edit = lambda old, new: BASE.replace(old, new)
         cases = [
