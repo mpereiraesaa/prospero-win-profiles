@@ -1,0 +1,26 @@
+# Prince of Persia through SDLPoP 1.23 (open source, 32-bit prince.exe) for
+# Prospero Win, in Lutris's installer format.
+#
+# There is no installer to run: give the recipe the SDLPoP folder, the one that
+# holds prince.exe and its data folder. It is copied into C:\Games\SDLPoP of a
+# prefix of its own. The recipe writes a profile with mode = xinput only; copy
+# profiles/sdlpop.profile over it to get the quicksave and touchpad keys.
+name: "Prince of Persia (SDLPoP)"
+game_slug: sdlpop
+version: SDLPoP 1.23 (Prospero Win)
+slug: sdlpop-prospero-win
+runner: wine
+prospero:
+  name: Prince of Persia
+  graphics: gdi
+  display: {desktop: 1920x1080, scaling: fit}
+  input: {mode: xinput}
+script:
+  game:
+    exe: drive_c/Games/SDLPoP/prince.exe
+    prefix: $GAMEDIR
+  files:
+  - game: "N/A:Select the SDLPoP folder (it holds prince.exe)"
+  installer:
+  - task: {name: create_prefix, prefix: $GAMEDIR, arch: win32}
+  - copy: {src: game, dst: $GAMEDIR/drive_c/Games/SDLPoP}
