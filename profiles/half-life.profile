@@ -21,4 +21,4 @@ show_fps = true
 opengl_thread = true
 
 [input]
-mode = xinput
+preset = goldsrc

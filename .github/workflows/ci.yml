@@ -23,8 +23,8 @@ jobs:
         run: python3 tools/check_profiles.py
       - name: Checker tests
         run: python3 -m unittest -v tests/test_check_profiles.py
-      - name: Shellcheck the benchmark build
-        run: shellcheck benchmarks/build.sh
+      - name: Shellcheck the benchmark and plugin builds
+        run: shellcheck benchmarks/build.sh plugins/sa-shadow-edges/build.sh
 
   benchmarks:
     runs-on: ubuntu-24.04
@@ -34,6 +34,8 @@ jobs:
         run: sudo apt-get update -q && sudo apt-get install -yq gcc-mingw-w64-i686 gcc-mingw-w64-x86-64 p7zip-full
       - name: Build the benchmark programs
         run: benchmarks/build.sh out
+      - name: San Andreas shadow-edge plugin (index tests, plugin build)
+        run: python3 -m unittest -v tests/test_sa_shadow_edges.py
       - name: Check what was built
         run: |
           for f in 7za.exe 7za-x64.exe 7za-License.txt nb-x87.exe nb-x64.exe NNET.DAT COM.DAT \

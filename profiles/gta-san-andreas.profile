@@ -1,6 +1,6 @@
 ; Grand Theft Auto: San Andreas (your own copy, PC version 1.0), Direct3D 9
-; through DXVK 2.6.2, at the console's 1920x1080 and 60 Hz, with mods that
-; make it play well on the DualSense.
+; through DXVK, at the console's 1920x1080 and 60 Hz, with mods that make it
+; play well on the DualSense.
 ;
 ; How it runs on the PS5 (October 2026): 60 fps in Grove Street and on the
 ; road, with the DualSense, intro movies and sound. With every mod below,
@@ -21,7 +21,15 @@
 ;   (/data/prospero-win/prefixes/gta-san-andreas/drive_c/Games/GTASA). It has
 ;   to be version 1.0, which the mods need: gta_sa.exe is 14,383,616 bytes.
 ;   Steam and Rockstar Games Launcher copies are newer and need downgrading.
-; - Put DXVK 2.6.2's 32-bit DLLs in that prefix's C:\windows\syswow64.
+; - It uses a DXVK build with two San Andreas fixes: 2.6.2-prospero1
+;   (github.com/mpereiraesaa/dxvk, DXVK 2.6.2 plus two commits). Its 32-bit
+;   DLLs go in that prefix's C:\windows\syswow64, and a dxvk.conf next to
+;   gta_sa.exe holds "d3d9.asyncSmallReadback = True". That option lets
+;   Proper Shaders' per-frame sky colour readback use the previous frame's
+;   value instead of making DXVK wait for the GPU every frame; the build also
+;   makes 32-bit DXVK's per-draw bookkeeping cheaper. Together they took
+;   Proper Shaders' medium preset from 42.5 to 44 fps on the console. Stock
+;   DXVK 2.6.2 also works, just slower with Proper Shaders.
 ; - Install LAV Filters in the prefix (winetricks lavfilters). The game plays
 ;   its intro movies through DirectShow; Wine's own MPEG decoder needs
 ;   GStreamer, which the console doesn't have, and without a working one the
@@ -49,6 +57,9 @@
 ;     so download it there): its plugin and ini in scripts, its resources
 ;     folder and .json files next to gta_sa.exe. Use preset 0 with Map = 1
 ;     in ProperShaders.ini; preset 0 with Map = 0 crashed on the PC.
+;   - Optional: ShadowEdgeIndex (plugins/sa-shadow-edges in
+;     prospero-win-profiles, built from source) makes the game's realtime
+;     shadows cheaper to build on the main thread, with the same result.
 ;
 ; The game keeps its settings and saves in
 ; C:\users\prospero\Documents\GTA San Andreas User Files.

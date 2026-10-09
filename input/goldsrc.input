@@ -1,0 +1,11 @@
+; GoldSrc menus read a mouse even when the game reads an XInput controller.
+; Keep the DualSense gamepad, move the pointer with the right stick, and
+; press the touchpad to click. Options sends Escape to leave a menu.
+; Pointer movement and these bindings also apply during gameplay; this
+; preset does not detect whether a menu is open. A USB mouse still works.
+[input]
+mode = xinput
+mouse = right_stick
+mouse_speed = 900
+touchpad = mouse_left
+options = escape

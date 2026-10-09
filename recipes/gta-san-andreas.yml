@@ -47,6 +47,19 @@
 # which the game loads at start, and passes the real one's calls on to it
 # under the name vorbisHooked.dll.
 #
+# Direct3D 9 goes through a DXVK build with two San Andreas fixes,
+# 2.6.2-prospero1 from github.com/mpereiraesaa/dxvk (DXVK 2.6.2 plus two
+# commits; Lutris doesn't know this version, so install with pw_install.py):
+# - d3d9.asyncSmallReadback, which the recipe turns on in a dxvk.conf next to
+#   gta_sa.exe. Proper Shaders reads the sky colour back from the GPU every
+#   frame, and stock DXVK stops and waits for the GPU each time; with this
+#   option that small read returns the previous frame's value instead.
+# - Cheaper reference counting and shader-constant copies in 32-bit DXVK,
+#   which San Andreas, a draw-call-heavy 32-bit game, spends a lot of its CPU
+#   time on.
+# On the console the two together took Proper Shaders' medium preset from
+# 42.5 to 44 fps on the same drive.
+#
 # The intro movies play through DirectShow. Wine's own MPEG splitter needs
 # GStreamer, which the console's Wine doesn't have, and without a working
 # one the game waits on the first movie forever. LAV Filters are Windows
@@ -109,10 +122,14 @@ script:
       sha256: 4795a84d6b1a3c35715ba579d2bbe491daa69ffa17e1b8c350a9265d3190e1c6
   wine:
     dxvk: true
-    dxvk_version: "2.6.2"
+    dxvk_version: "2.6.2-prospero1"
   installer:
   - task: {name: create_prefix, prefix: $GAMEDIR, arch: win32}
   - copy: {src: game, dst: $GAMEDIR/drive_c/Games/GTASA}
+  # The option the custom DXVK build adds (see above).
+  - write_file:
+      file: $GAMEDIR/drive_c/Games/GTASA/dxvk.conf
+      content: "d3d9.asyncSmallReadback = True\n"
   - task: {name: winetricks, app: lavfilters, prefix: $GAMEDIR}
   # The ASI loader as vorbisFile.dll, the real one as vorbisHooked.dll.
   - move:

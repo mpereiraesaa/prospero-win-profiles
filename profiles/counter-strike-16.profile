@@ -48,3 +48,6 @@ graphics = opengl
 desktop = 1920x1080
 show_fps = true
 opengl_thread = true
+
+[input]
+preset = goldsrc
