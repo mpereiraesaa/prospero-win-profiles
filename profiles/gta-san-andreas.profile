@@ -21,8 +21,8 @@
 ;   (/data/prospero-win/prefixes/gta-san-andreas/drive_c/Games/GTASA). It has
 ;   to be version 1.0, which the mods need: gta_sa.exe is 14,383,616 bytes.
 ;   Steam and Rockstar Games Launcher copies are newer and need downgrading.
-; - It uses a DXVK build with two San Andreas fixes: 2.6.2-prospero1
-;   (github.com/mpereiraesaa/dxvk, DXVK 2.6.2 plus two commits). Its 32-bit
+; - It uses our DXVK build, 2.6.2-prospero2 (github.com/mpereiraesaa/dxvk,
+;   DXVK 2.6.2 plus the San Andreas and CS-thread changes). Its 32-bit
 ;   DLLs go in that prefix's C:\windows\syswow64, and a dxvk.conf next to
 ;   gta_sa.exe holds "d3d9.asyncSmallReadback = True". That option lets
 ;   Proper Shaders' per-frame sky colour readback use the previous frame's

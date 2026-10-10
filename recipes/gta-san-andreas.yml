@@ -47,18 +47,23 @@
 # which the game loads at start, and passes the real one's calls on to it
 # under the name vorbisHooked.dll.
 #
-# Direct3D 9 goes through a DXVK build with two San Andreas fixes,
-# 2.6.2-prospero1 from github.com/mpereiraesaa/dxvk (DXVK 2.6.2 plus two
-# commits; Lutris doesn't know this version, so install with pw_install.py):
-# - d3d9.asyncSmallReadback, which the recipe turns on in a dxvk.conf next to
-#   gta_sa.exe. Proper Shaders reads the sky colour back from the GPU every
-#   frame, and stock DXVK stops and waits for the GPU each time; with this
-#   option that small read returns the previous frame's value instead.
-# - Cheaper reference counting and shader-constant copies in 32-bit DXVK,
-#   which San Andreas, a draw-call-heavy 32-bit game, spends a lot of its CPU
-#   time on.
-# On the console the two together took Proper Shaders' medium preset from
-# 42.5 to 44 fps on the same drive.
+# Direct3D 9 goes through our DXVK build, 2.6.2-prospero2 from
+# github.com/mpereiraesaa/dxvk (DXVK 2.6.2 plus changes these games need;
+# Lutris doesn't know this version, so install with pw_install.py). The recipe
+# writes three options for it into a dxvk.conf next to gta_sa.exe (the
+# README's "DXVK options we use" says what each does):
+# - d3d9.asyncSmallReadback. Proper Shaders reads the sky colour back from the
+#   GPU every frame, and stock DXVK stops and waits for the GPU each time;
+#   with this option that small read returns the previous frame's value.
+# - d3d9.padVsOutputs, so Proper Shaders' vertex shaders no longer stop
+#   fixed-function pixel shaders from being fast-linked.
+# - dxvk.numCompilerThreads = 4, so new shaders compile sooner.
+# Played on the console with Proper Shaders and SkyGfx together, those three
+# took away most of the hitching. The build also makes 32-bit DXVK's per-draw
+# bookkeeping and its command thread cheaper, which San Andreas, a
+# draw-call-heavy 32-bit game, spends a lot of its CPU time on (the earlier
+# 2.6.2-prospero1 build alone took Proper Shaders' medium preset from 42.5 to
+# 44 fps on the same drive).
 #
 # The intro movies play through DirectShow. Wine's own MPEG splitter needs
 # GStreamer, which the console's Wine doesn't have, and without a working
@@ -122,14 +127,17 @@ script:
       sha256: 4795a84d6b1a3c35715ba579d2bbe491daa69ffa17e1b8c350a9265d3190e1c6
   wine:
     dxvk: true
-    dxvk_version: "2.6.2-prospero1"
+    dxvk_version: "2.6.2-prospero2"
   installer:
   - task: {name: create_prefix, prefix: $GAMEDIR, arch: win32}
   - copy: {src: game, dst: $GAMEDIR/drive_c/Games/GTASA}
-  # The option the custom DXVK build adds (see above).
+  # The options the custom DXVK build adds (see above).
   - write_file:
       file: $GAMEDIR/drive_c/Games/GTASA/dxvk.conf
-      content: "d3d9.asyncSmallReadback = True\n"
+      content: |
+        d3d9.asyncSmallReadback = True
+        d3d9.padVsOutputs = True
+        dxvk.numCompilerThreads = 4
   - task: {name: winetricks, app: lavfilters, prefix: $GAMEDIR}
   # The ASI loader as vorbisFile.dll, the real one as vorbisHooked.dll.
   - move:

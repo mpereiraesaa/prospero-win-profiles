@@ -12,6 +12,14 @@
 # hands over to the Rockstar Games Launcher, which starts GTAIV.exe as a
 # second process, and Wine on the console does not start other processes.
 #
+# Direct3D 9 goes through our DXVK build, 2.6.2-prospero2 from
+# github.com/mpereiraesaa/dxvk (Lutris doesn't know this version, so install
+# with pw_install.py). It lowers the cost of DXVK's command thread, which sat
+# at over 95% in this game, and the recipe turns on one option it adds in a
+# dxvk.conf next to GTAIV.exe: d3d9.weakRenderTargetFlushHint, which counts a
+# change of render target 0 as a weak hint to submit the queued work sooner
+# (the README's "DXVK options we use"). It played better than without it.
+#
 # Mods are optional and not installed here; the README explains how to add
 # the Ultimate ASI Loader and FusionFix to the prefix this recipe makes.
 name: "Grand Theft Auto IV: The Complete Edition"
@@ -35,7 +43,7 @@ script:
   - game: "N/A:Select the GTAIV folder of your installed Grand Theft Auto IV: The Complete Edition (it holds GTAIV.exe)"
   wine:
     dxvk: true
-    dxvk_version: "2.6.2"
+    dxvk_version: "2.6.2-prospero2"
     overrides:
       # Native first, so the Ultimate ASI Loader loads if you add it (it
       # ships as dinput8.dll); Wine's own dinput8 otherwise.
@@ -68,6 +76,11 @@ script:
   # fr-FR, de-DE, it-IT, es-ES, ru-RU, ja-JP...); without it the game follows
   # the system's language. No frame limiter: the console presents at 60 Hz
   # with vsync.
+  # The option the custom DXVK build adds (see above).
+  - write_file:
+      file: $GAMEDIR/drive_c/Games/GTAIV/dxvk.conf
+      content: |
+        d3d9.weakRenderTargetFlushHint = True
   - write_file:
       file: $GAMEDIR/drive_c/Games/GTAIV/commandline.txt
       content: |

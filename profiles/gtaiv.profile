@@ -1,6 +1,6 @@
 ; Grand Theft Auto IV: The Complete Edition (your own copy, version
 ; 1.2.0.59, with The Lost and Damned and The Ballad of Gay Tony), Direct3D 9
-; through DXVK 2.6.2, at the console's native 1920x1080 and 60 Hz.
+; through DXVK 2.6.2 (our 2.6.2-prospero2 build), at the console's native 1920x1080 and 60 Hz.
 ;
 ; How it runs on the PS5 (prospero-win main, October 2026): the open city
 ; plays at roughly 54 to 55 fps. Quiet streets come close to 59 fps, while
@@ -11,10 +11,11 @@
 ; - Copy the GTAIV folder of your installed copy (the folder that holds
 ;   GTAIV.exe, common, pc, TLAD and TBoGT) into C:\Games\GTAIV of a prefix of
 ;   its own (/data/prospero-win/prefixes/gtaiv/drive_c/Games/GTAIV).
-; - Put DXVK 2.6.2's 32-bit DLLs (the release's x32 folder) in that prefix's
-;   C:\windows\syswow64, as for Half-Life 2. No dxvk.conf is needed; with the
-;   October 2026 DXVK build (README, "DXVK options we use") a dxvk.conf in the
-;   game's folder holding d3d9.weakRenderTargetFlushHint = True looked better.
+; - Put our DXVK build 2.6.2-prospero2's 32-bit DLLs (github.com/mpereiraesaa/dxvk,
+;   the release's x32 folder; stock 2.6.2 also runs it) in that prefix's
+;   C:\windows\syswow64, as for Half-Life 2. With the prospero2 build a
+;   dxvk.conf in the game's folder holding d3d9.weakRenderTargetFlushHint =
+;   True (README, "DXVK options we use") looked better; the recipe writes it.
 ; - The game also reads its options from commandline.txt in its own folder.
 ;   Put the same options there as in "arguments" below. The first three stop
 ;   the game from capping its settings to the video memory it detects;
