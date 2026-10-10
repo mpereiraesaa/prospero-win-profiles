@@ -55,6 +55,34 @@ settings: a current runtime ignores both (it logs
 `PW_WINE64 ignored display refresh=... opengl_thread=...`), so the profiles
 here no longer set them; the output rate is no longer a per-game setting.
 
+## DXVK options we use
+
+TL;DR: a few `dxvk.conf` lines (in the game's folder, or point `DXVK_CONFIG_FILE`
+at a file from a profile's `[debug] env`) smooth Direct3D 9 games on the PS5.
+They need the DXVK build from `github.com/mpereiraesaa/dxvk`, branch
+`prospero/v2.6.2` at `a6f6dcc1` or later; older builds ignore lines they don't
+know. Each was judged by playing on the console (2026-10-10).
+
+| Line | What it does | Where it helped |
+|---|---|---|
+| `d3d9.padVsOutputs = True` | Programmable vertex shaders export zero for the TEXCOORD/FOG outputs they never write, so fixed-function pixel shaders can be fast-linked from precompiled parts instead of compiled in full | GTA SA with Proper Shaders: most of the hitching gone |
+| `dxvk.numCompilerThreads = 4` | More pipeline-compile workers, so a new shader is ready sooner (the compile gate in winevulkan, prospero-win #676, keeps them from blocking the render thread) | GTA SA with Proper Shaders |
+| `d3d9.asyncSmallReadback = True` | A small per-frame GPU readback uses the previous frame's value instead of making DXVK wait for the GPU | GTA SA (the sky colour Proper Shaders reads) |
+| `d3d9.weakRenderTargetFlushHint = True` | A change of render target 0 counts as a weak hint to submit the queued work sooner | GTA IV: looked better |
+
+Also in that build, with no option to set: threads are woken after the queue
+lock is released, a texture bind only dirties its own shader stage, and no-op
+depth-stencil changes are skipped. They lower the cost of DXVK's command
+thread, which sat at 90 to 95% in GTA SA and GTA IV. Available but not used:
+`dxvk.implicitFlushChunkScale` (when DXVK flushes by itself) and
+`dxvk.logFastLinkFailures` (logs what blocked a fast link; handy to see why a
+new game still compiles shaders in full).
+
+To explore a new game: add one line at a time, play the part that hitched, and
+keep only what you can see or measure. A profile can also set
+`thread_scheduling`, `shared_input` and `fast_clock` under `[runtime]`, which
+the GTA profiles use.
+
 ## Install
 
 The library lives in `/data/prospero-win` on the console:

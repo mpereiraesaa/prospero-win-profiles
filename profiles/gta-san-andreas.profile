@@ -29,7 +29,10 @@
 ;   value instead of making DXVK wait for the GPU every frame; the build also
 ;   makes 32-bit DXVK's per-draw bookkeeping cheaper. Together they took
 ;   Proper Shaders' medium preset from 42.5 to 44 fps on the console. Stock
-;   DXVK 2.6.2 also works, just slower with Proper Shaders.
+;   DXVK 2.6.2 also works, just slower with Proper Shaders. With Proper Shaders
+;   and SkyGfx together, the October 2026 DXVK build (README, "DXVK options we
+;   use") and a dxvk.conf of d3d9.padVsOutputs = True, dxvk.numCompilerThreads
+;   = 4 and d3d9.asyncSmallReadback = True removed most of the hitching.
 ; - Install LAV Filters in the prefix (winetricks lavfilters). The game plays
 ;   its intro movies through DirectShow; Wine's own MPEG decoder needs
 ;   GStreamer, which the console doesn't have, and without a working one the

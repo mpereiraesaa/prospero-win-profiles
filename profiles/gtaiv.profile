@@ -12,7 +12,9 @@
 ;   GTAIV.exe, common, pc, TLAD and TBoGT) into C:\Games\GTAIV of a prefix of
 ;   its own (/data/prospero-win/prefixes/gtaiv/drive_c/Games/GTAIV).
 ; - Put DXVK 2.6.2's 32-bit DLLs (the release's x32 folder) in that prefix's
-;   C:\windows\syswow64, as for Half-Life 2. No dxvk.conf.
+;   C:\windows\syswow64, as for Half-Life 2. No dxvk.conf is needed; with the
+;   October 2026 DXVK build (README, "DXVK options we use") a dxvk.conf in the
+;   game's folder holding d3d9.weakRenderTargetFlushHint = True looked better.
 ; - The game also reads its options from commandline.txt in its own folder.
 ;   Put the same options there as in "arguments" below. The first three stop
 ;   the game from capping its settings to the video memory it detects;
