@@ -120,11 +120,11 @@ def input_line(seen, key, value, allow_preset):
     if key in seen:
         raise Refused(f"duplicate {key}")
     seen.add(key)
-    if key == "preset":
+    if key in ("preset", "player2"):
         if not allow_preset:
-            raise Refused("preset inside a preset file")
+            raise Refused(f"{key} inside a preset file")
         if not value or len(value) >= ID_CAP or not re.fullmatch(r"[a-z0-9_-]+", value):
-            raise Refused(f"preset {value!r}")
+            raise Refused(f"{key} {value!r}")
     elif key == "mode":
         if value.lower() not in ("keyboard", "xinput"):
             raise Refused(f"mode {value!r}")
@@ -222,12 +222,12 @@ def parse_profile(data):
             raise Refused(f"{key} {fields[key]!r} is not an absolute Windows path")
     if not fields["executable"].lower().endswith(".exe"):
         raise Refused("executable does not end in .exe")
-    preset = ""
+    named = {"preset": "", "player2": ""}
     for raw in re.split(rb"[\r\n]+", data):
-        m = re.fullmatch(rb"[ \t]*preset[ \t]*=[ \t]*([^ \t]*)[ \t]*", raw, re.I)
+        m = re.fullmatch(rb"[ \t]*(preset|player2)[ \t]*=[ \t]*([^ \t]*)[ \t]*", raw, re.I)
         if m:
-            preset = m[1].decode()
-    return fields, preset
+            named[m[1].decode().lower()] = m[2].decode()
+    return fields, named
 
 
 def parse_preset(data):
@@ -287,11 +287,12 @@ def main(root):
             try:
                 if path.suffix != ".profile" or len(path.name) >= NAME_MAX or not FILE_NAME.match(path.name):
                     raise Refused("file name must be <lowercase id>.profile")
-                fields, preset = parse_profile(path.read_bytes())
+                fields, named = parse_profile(path.read_bytes())
                 if fields["id"] != path.stem:
                     raise Refused(f"id {fields['id']!r} differs from the file name")
-                if preset and preset not in presets:
-                    raise Refused(f"preset {preset!r} has no input/{preset}.input")
+                for key, preset in named.items():
+                    if preset and preset not in presets:
+                        raise Refused(f"{key} {preset!r} has no input/{preset}.input")
                 found[path.name] = fields
             except Refused as error:
                 fail(path, error)

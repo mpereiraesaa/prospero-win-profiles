@@ -20,3 +20,4 @@ scaling = fit
 
 [input]
 preset = atomic-bomberman
+player2 = atomic-bomberman-p2

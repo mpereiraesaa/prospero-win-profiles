@@ -62,6 +62,9 @@ class ProfileRules(unittest.TestCase):
             (edit("preset = pinball", "preset = pinball\nr1 = vk:0x00"), False),
             (edit("preset = pinball", "preset = pinball\ncross = f25"), False),
             (edit("preset = pinball", "preset = Pin"), False),
+            (edit("preset = pinball", "preset = pinball\nplayer2 = pinball-p2"), True),
+            (edit("preset = pinball", "preset = pinball\nplayer2 = P2"), False),
+            (edit("preset = pinball", "preset = pinball\nplayer2 = a\nplayer2 = b"), False),
             (edit("graphics = gdi", "graphics = gdi\ngraphics = gdi"), False),
             (edit("graphics = gdi", "graphics = DXVK"), True),
             (edit("graphics = gdi", "graphics = OPENGL"), True),
@@ -123,6 +126,7 @@ class ProfileRules(unittest.TestCase):
         cases = [
             (PRESET, True),
             (PRESET + "preset = x\n", False),
+            (PRESET + "player2 = x\n", False),
             (PRESET.replace("mode = keyboard", "mode = arcade"), False),
             (PRESET + "[display]\nscaling = fit\n", False),
             (PRESET.replace("l1 = z", "l1 = z\nl1 = x"), False),
@@ -162,6 +166,13 @@ class RepositoryRules(unittest.TestCase):
     def test_preset_must_exist(self):
         (self.root / "input" / "pinball.input").unlink()
         self.assertEqual(cp.main(self.root), 1)
+
+    def test_player2_preset_must_exist(self):
+        profile = self.root / "profiles" / "pinball.profile"
+        profile.write_text(profile.read_text().replace("preset = pinball", "preset = pinball\nplayer2 = ghost"))
+        self.assertEqual(cp.main(self.root), 1)
+        (self.root / "input" / "ghost.input").write_text("[input]\ncross = s\n")
+        self.assertEqual(cp.main(self.root), 0)
 
     def test_catalog_must_list_every_profile(self):
         lst = self.root / "profiles" / "profiles.lst"

@@ -30,7 +30,9 @@ prospero:
   # renderer (below).
   graphics: gdi
   display: {desktop: 640x480, scaling: fit}
-  input: {preset: atomic-bomberman}
+  # player2: a second DualSense, signed in as another PS5 user, plays as
+  # the game's second key set (Key 1).
+  input: {preset: atomic-bomberman, player2: atomic-bomberman-p2}
 script:
   game:
     exe: drive_c/INTRPLAY/BOMBRMAN/BM95.EXE

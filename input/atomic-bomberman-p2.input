@@ -1,0 +1,16 @@
+; Atomic Bomberman's second player on a second DualSense (the pad of another
+; signed-in PS5 user), as the game's second key set, Key 1: the d-pad moves
+; (R, G, F, D), Cross drops a bomb (S) and Circle is the action key (A).
+; Choose Key 1 for that player in the game. Needs a prospero-win with
+; [input] player2.
+[input]
+mode = keyboard
+mouse = none
+up = r
+right = g
+down = f
+left = d
+cross = s
+circle = a
+square = s
+triangle = a
