@@ -149,6 +149,7 @@ class RepositoryRules(unittest.TestCase):
         self.root = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.root)
         shutil.copytree(ROOT / "profiles", self.root / "profiles")
+        shutil.copytree(ROOT / "benchmarks" / "profiles", self.root / "benchmarks" / "profiles")
         shutil.copytree(ROOT / "input", self.root / "input")
 
     def test_this_repository(self):
@@ -179,6 +180,16 @@ class RepositoryRules(unittest.TestCase):
         lst.write_text("../pinball.profile\n")
         self.assertEqual(cp.main(self.root), 1)
         lst.unlink()
+        self.assertEqual(cp.main(self.root), 1)
+
+    def test_benchmark_profiles_stay_out_of_the_catalog(self):
+        self.assertFalse(list((self.root / "profiles").glob("*bench*.profile")))
+        lst = self.root / "profiles" / "profiles.lst"
+        self.assertNotIn("sevenzip-bench", lst.read_text())
+        self.assertEqual(cp.main(self.root), 0)
+
+    def test_benchmark_profiles_are_checked_too(self):
+        (self.root / "benchmarks" / "profiles" / "pi-x87.profile").write_text("[input]\n")
         self.assertEqual(cp.main(self.root), 1)
 
     def test_catalog_entries_must_exist(self):

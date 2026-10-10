@@ -9,6 +9,9 @@ benchmark programs from their pinned upstream sources.
 
 ## Profiles
 
+The benchmark rows (`sevenzip-bench`, `nbench-*`, `pi-*`) have their profiles in
+`benchmarks/profiles/`, outside the launcher's catalog.
+
 | Profile | Program | Architecture | Checked on FW 12.02 |
 |---|---|---|---|
 | `minesweeper` | Wine's Minesweeper (ships with the prefix) | PE64 | Played with the stick-driven pointer |
@@ -96,10 +99,14 @@ The library lives in `/data/prospero-win` on the console:
 
 1. Copy `profiles/*.profile` and `input/*.input` there. `profiles.lst` sets
    the launcher's order; if you already have one, add these names to it
-   instead of replacing it.
+   instead of replacing it. The launcher reads at most 16 entries and drops
+   the whole list above that, so `profiles.lst` is kept to games.
 2. For the benchmarks, run `benchmarks/build.sh out` (it needs curl, tar,
    patch, `7z`, `i686-w64-mingw32-gcc` and `x86_64-w64-mingw32-gcc`) and
-   copy everything in `out/` except `.cache` to `prefix/drive_c/Tools`.
+   copy everything in `out/` except `.cache` to `prefix/drive_c/Tools`. Their
+   profiles are in `benchmarks/profiles/` and are not in `profiles.lst`: copy
+   the ones you want to `profiles/` on the console and add them to its list
+   while you run them.
 3. For Pinball, copy your installed game to `prefix/drive_c/Games/Pinball`.
 4. For OpenArena or Half-Life, copy your own Windows game files to
    `prefix/drive_c/Games/OpenArena` or `prefix/drive_c/Games/HalfLife`.

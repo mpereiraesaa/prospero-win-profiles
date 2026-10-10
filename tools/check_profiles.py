@@ -279,21 +279,28 @@ def main(root):
         except Refused as error:
             fail(path, error)
 
-    profiles = {}
-    for path in sorted((root / "profiles").glob("*")):
-        if path.name == "profiles.lst":
-            continue
-        try:
-            if path.suffix != ".profile" or len(path.name) >= NAME_MAX or not FILE_NAME.match(path.name):
-                raise Refused("file name must be <lowercase id>.profile")
-            fields, preset = parse_profile(path.read_bytes())
-            if fields["id"] != path.stem:
-                raise Refused(f"id {fields['id']!r} differs from the file name")
-            if preset and preset not in presets:
-                raise Refused(f"preset {preset!r} has no input/{preset}.input")
-            profiles[path.name] = fields
-        except Refused as error:
-            fail(path, error)
+    def check_profiles(folder):
+        found = {}
+        for path in sorted(folder.glob("*")):
+            if path.name == "profiles.lst":
+                continue
+            try:
+                if path.suffix != ".profile" or len(path.name) >= NAME_MAX or not FILE_NAME.match(path.name):
+                    raise Refused("file name must be <lowercase id>.profile")
+                fields, preset = parse_profile(path.read_bytes())
+                if fields["id"] != path.stem:
+                    raise Refused(f"id {fields['id']!r} differs from the file name")
+                if preset and preset not in presets:
+                    raise Refused(f"preset {preset!r} has no input/{preset}.input")
+                found[path.name] = fields
+            except Refused as error:
+                fail(path, error)
+        return found
+
+    profiles = check_profiles(root / "profiles")
+    # The benchmark profiles are not games: they stay out of the launcher's 16-entry
+    # catalog, but the same rules apply to them.
+    benchmark_profiles = check_profiles(root / "benchmarks" / "profiles")
 
     catalog = root / "profiles" / "profiles.lst"
     try:
@@ -312,7 +319,8 @@ def main(root):
         print(error, file=sys.stderr)
     if errors:
         return 1
-    print(f"profiles ok: {len(profiles)} profiles, {len(presets)} presets, profiles.lst complete")
+    print(f"profiles ok: {len(profiles)} profiles, {len(benchmark_profiles)} benchmark profiles, "
+          f"{len(presets)} presets, profiles.lst complete")
     return 0
 
 
