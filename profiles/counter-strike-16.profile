@@ -1,5 +1,6 @@
-; Counter-Strike 1.6 (your own copy) through the PS5 OpenGL backend, at the
-; console's native 1920x1080, starting at the main menu.
+; Counter-Strike 1.6 (your own copy), drawing its OpenGL through Mesa's Zink on
+; the console's Vulkan driver, at the console's native 1920x1080, starting at
+; the main menu.
 ;
 ; Setting it up:
 ; - Install the game on your PC with prospero-win's host Wine
@@ -24,15 +25,15 @@
 ; "bot_join_after_player 0" and "bot_quota 9" at the end of
 ; cstrike\listenserver.cfg instead, and start a game from the menu.
 ;
-; opengl_thread runs the game's OpenGL work on its own CPU core, beside the
-; game. With nine bots it keeps 60 fps far more of the time; the first seconds
-; of a map, while the bots spawn, can still dip.
+; With nine bots on de_dust2 it holds 60 fps; the first seconds of a map,
+; while the bots spawn and the shaders compile, can still dip.
 ;
-; Needs a prospero-win runtime with the JECXZ/LOOP fallback (vgui2.dll uses
-; JECXZ; without it the game quits before its menu), the OpenGL mouse cursor
-; (Wine patch 0723), SDL_JOYSTICK_RAWINPUT for the gamepad, and the
-; [display] opengl_thread setting (an older runtime refuses this profile;
-; delete that line to use one).
+; Needs prospero-win main from October 2026 or later: OpenGL games run through
+; Zink (the PS5 OpenGL SDK backend is gone), the menu draws and takes the
+; cursor on the current PS5 Vulkan driver, and the DualSense moves and clicks
+; the menu cursor through the goldsrc preset. Older runtimes wanted an
+; opengl_thread line here; current ones ignore it, so the profile no longer
+; sets it.
 [application]
 id = counter-strike-16
 name = Counter-Strike 1.6
@@ -47,7 +48,6 @@ graphics = opengl
 [display]
 desktop = 1920x1080
 show_fps = true
-opengl_thread = true
 
 [input]
 preset = goldsrc
