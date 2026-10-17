@@ -30,10 +30,12 @@
 ; - The DualSense reaches the engine as an XInput pad. Saves go to bms\SAVE
 ;   inside the prefix.
 ;
-; Checked on the PS5 2026-10-16: the game starts on the console and renders
-; the menu's background map (about 40 s to the menu, 1.1 GB of direct memory).
-; The classic menu switch was verified on the PC with the console's Wine;
-; gameplay on the console is not yet checked.
+; Checked on the PS5 2026-10-16: 15 minutes played with the DualSense from
+; the classic menu, through Black Mesa Inbound into Anomalous Materials
+; (bm_c0a0a to bm_c1a0b): map transitions and autosave loads take 4 to 6 s,
+; direct memory peaks at 1.4 GB, and the game exits to the launcher. The
+; menu's background map comes up about 40 s after the start. Frame rate not
+; yet measured (set show_fps = true under [display] for the counter).
 [application]
 id = blackmesa
 name = Black Mesa
