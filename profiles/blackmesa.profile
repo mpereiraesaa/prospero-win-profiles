@@ -34,8 +34,8 @@
 ; the classic menu, through Black Mesa Inbound into Anomalous Materials
 ; (bm_c0a0a to bm_c1a0b): map transitions and autosave loads take 4 to 6 s,
 ; direct memory peaks at 1.4 GB, and the game exits to the launcher. The
-; menu's background map comes up about 40 s after the start. Frame rate not
-; yet measured (set show_fps = true under [display] for the counter).
+; menu's background map comes up about 40 s after the start. The game's
+; own frame counter stayed at its 60 fps cap the whole way.
 [application]
 id = blackmesa
 name = Black Mesa
