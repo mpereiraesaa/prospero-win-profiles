@@ -1,0 +1,47 @@
+# Dyson Sphere Program (Steam copy) for Prospero Win, in Lutris's installer
+# format.
+#
+# There is no installer to run: DSP is a 64-bit Unity game, so give this
+# recipe the folder Steam installed it into (the one that holds DSPGAME.exe,
+# DSPGAME_Data, UnityPlayer.dll and steam_api64.dll). It is copied into
+# C:\Games\DysonSphereProgram inside a fresh prefix.
+#
+# Launch DSPGAME.exe directly. Do not use a Steam URL or steam.exe: the PS5
+# title cannot create processes, and the console has no Steam client.
+#
+# Direct3D 11 goes through DXVK. Saves stay in the prefix under
+# C:\users\prospero\Documents\Dyson Sphere Program.
+#
+# Steamworks: some Steam games start from their exe without Steam running,
+# some do not. Test the prefix on the PC before pushing it; a recipe cannot
+# bypass Steam DRM.
+name: "Dyson Sphere Program"
+game_slug: dyson-sphere-program
+version: Steam copy (Prospero Win)
+slug: dyson-sphere-program-prospero-win
+runner: wine
+
+prospero:
+  name: Dyson Sphere Program
+  graphics: dxvk
+  display: {desktop: 1920x1080, scaling: fit}
+  # DSP is played with mouse and keyboard. The shared "mouse" preset maps the
+  # DualSense to the pointer and clicks; USB keyboard and mouse work as well.
+  # A custom preset can add hotkeys later.
+  input: {preset: mouse, mode: keyboard}
+
+script:
+  game:
+    exe: drive_c/Games/DysonSphereProgram/DSPGAME.exe
+    prefix: $GAMEDIR
+
+  files:
+    - game: "N/A:Select the Dyson Sphere Program folder (it holds DSPGAME.exe)"
+
+  wine:
+    dxvk: true
+    dxvk_version: "2.6.2"
+
+  installer:
+    - task: {name: create_prefix, prefix: $GAMEDIR, arch: win32}
+    - copy: {src: game, dst: $GAMEDIR/drive_c/Games/DysonSphereProgram}
