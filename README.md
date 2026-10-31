@@ -26,6 +26,7 @@ The benchmark rows (`sevenzip-bench`, `nbench-*`, `pi-*`) have their profiles in
 | `gta-san-andreas` | Grand Theft Auto: San Andreas 1.0 (your own copy in `C:\Games\GTASA` of its own prefix, with our DXVK 2.6.2-prospero2, LAV Filters and mods; installed from `recipes/`) | PE32, Direct3D 9 | 2026-10-05: 60 fps at 1920x1080 in Grove Street and on the road, intro movies with sound, DualSense through GInput; with CLEO 4, Mod Loader and Proper Shaders (preset 0) 59.3 fps average on a Los Santos drive; needs prospero-win #373 and #374, plus #380, #382, #385 and #387 for CLEO, Mod Loader and Proper Shaders |
 | `atomic-bomberman` | Atomic Bomberman (your own CD, installed from `recipes/` into its own prefix; cnc-ddraw draws the 8-bit DirectDraw frames) | PE32, DirectDraw | 2026-10-07 on FW 13.42: menus, sound and a match with the DualSense (`atomic-bomberman` preset), on the unpatched game; needs prospero-win #425 and #426, and #423 when another loader already shows `/data`; without #428 the game stalls now and then until the next button press |
 | `sdlpop` | Prince of Persia through SDLPoP 1.23 (your own copy in `C:\Games\SDLPoP` of its own prefix; installed from `recipes/`) | PE32 | 2026-10, on FW 10.01 (not 12.02), ShadowMountPlus 1.7beta3: plays with the DualSense (XInput), L3 quicksaves, R3 quickloads and the touchpad shows the time left; software rendering (`gdi`), performance not measured |
+| `resident-evil-hd-remaster` | Resident Evil HD REMASTER (your installed GOG copy in `C:\Games\REHDRemaster` of its own prefix, about 18 GB, with our DXVK 2.6.2-prospero2, Microsoft's d3dx9_43, d3dcompiler_47 and Windows Media runtime, and ThirteenAG's Resident Evil Fusion Fix; installed from `recipes/`; see below for ReShade, the 4K backgrounds and our trainer) | PE32, Direct3D 9 | 2026-10-31: played on the PS5 at 1920x1080, full screen, the game's VARIABLE frame rate, with ReShade's BetterRE preset and the 4K background pack: smooth throughout (the user's words: perfect performance), DualSense, the Fusion Fix door skip, cutscenes playing once the Windows Media runtime was in the prefix (black screen after the Capcom logo without it) |
 | `sevenzip-bench` | 7-Zip 25.01 benchmark, `7za b -mmt1 -md22` | PE32 | 2026-09-28: 3361–3369 total MIPS |
 | `nbench-x87` | nbench (BYTEmark 2.2.3), x87 build | PE32 | 2026-09-28: all ten tests; integer index 166.7, FP index 81.6 |
 | `pi-x87` | Ooura's `pi_fftca`, 4.2M digits, x87 build | PE32 | 2026-09-28: 13 s, digits written to `pi.dat` |
@@ -138,6 +139,7 @@ python3 tools/pw_prefix.py push warcraft-iii-reign-of-chaos --library ~/prospero
 | `warcraft-iii-reign-of-chaos` | Blizzard's 1.27a installer (it shows its license through Wine Gecko); registers `blizzard.ax`, and LAV Filters (`winetricks lavfilters`) for the cinematics, since the console's Wine has no GStreamer; RenderEdge_Widescreen (pinned by SHA-256) for 16:9; Direct3D 9 through DXVK because that route has been exercised on-console while the new WGL route remains unvalidated; 1920x1080, the console desktop's size |
 | `gtaiv` | No installer: give it the GTAIV folder of your installed Complete Edition (`--file game=<that folder>`). Copies it to `C:\Games\GTAIV`, records the install folder in the registry, installs DXVK 2.6.2, and writes a `commandline.txt` with the profile's options (video memory limits lifted, 1920x1080 at 60 Hz, fullscreen, English) |
 | `blackmesa` | No installer: give it your installed Black Mesa folder (`--file game=<the folder with bms.exe>`). Copies it to `C:\Games\BlackMesa`, installs DXVK 2.6.2, and replaces `bin\steam_api.dll` with the Goldberg emulator's regular 32-bit build (gbe_fork release 2026-09-27, pinned by SHA-256) with its `steam_settings`, `steam_appid.txt` and a `steam_interfaces.txt` listed from the original DLL, since the game refuses to start without Steam and the console runs one process (no client loader). The profile starts the engine's classic menu with `-oldgameui`: the 2020 Qt menu is a Direct3D shared texture the console's Vulkan driver cannot create |
+| `resident-evil-hd-remaster` | No installer: give it your installed GOG copy's folder (`--file game=<the folder with bhd.exe>`). Copies it to `C:\Games\REHDRemaster`, installs DXVK 2.6.2-prospero2, Microsoft's `d3dx9_43` and `d3dcompiler_47` (winetricks, native), the Windows Media runtime (`winetricks wmp11`, with `wmvcore`, `wmasf` and the WMV/WMA decoder DMOs overridden to native and renamed to lower case: every cutscene is a VC-1 WMV played through WMVCore, which in Wine needs GStreamer, absent on the console), unpacks the Resident Evil Fusion Fix (WidescreenFixesPack release `re1`, the 2026-09-28 archive, pinned by SHA-256) with its Ultimate ASI Loader as `dinput8.dll` (`dinput8=n,b`), writes the fix's settings (frame rate cap lifted, cursor hidden, door skip, no noise filter, no colour correction, no borderless window) and the game's `config.ini` for 1920x1080 full screen at the VARIABLE frame rate |
 | `atomic-bomberman` | No installer: give it the folder that holds `BM95.EXE` (`--disc`, a mounted disc or an unpacked .bin/.cue). Copies the game to `C:\INTRPLAY\BOMBRMAN` as Lutris's CD script does and installs cnc-ddraw 7.1.0.0 (pinned by SHA-256) for the 8-bit palettised frames |
 
 ### Grand Theft Auto IV: settings and optional mods
@@ -212,6 +214,38 @@ winetricks downloads the redistributable from Microsoft.
 
 The test runs used a small god-mode plugin of our own so long drives weren't
 cut short. It isn't needed and isn't published.
+
+### Resident Evil HD REMASTER: what we play it with
+
+The recipe gives you the game with the Fusion Fix. These are the additions on
+our console, none of them needed to play:
+
+- **ReShade 6.7.3 with the BetterRE preset** (Riujy, Nexus Mods). ReShade's
+  32-bit `d3d9.dll` goes in the game's folder with `ReShade.ini`, the preset's
+  `.ini` and its `reshade-shaders\`; it chains to the prefix's DXVK in
+  `syswow64`, not to a Wine builtin, and compiles its effects with the native
+  `d3dcompiler_47` the recipe installs. ReShade checks GitHub for updates at
+  start; the console has no internet, so the prefix's Internet Settings name
+  a proxy that goes nowhere (`127.0.0.1:9`) and the check fails at once
+  instead of waiting. Played through on the PS5 with the preset on: smooth,
+  no frame-rate cost we could notice.
+- **4K Texture Pack AI-Enhanced REalistic v2.0** (Evgeshajk, Nexus Mods
+  174): replaces the pre-rendered backgrounds, `nativePC\arc\scr\*.arc`
+  (1801 files, 10 GB); copy them over the game's. Room loads stayed quick.
+- **RE1.Trainer**, our in-game trainer for the DualSense (GPLv3, ImGui;
+  published separately): `RE1.Trainer.asi` and `RE1.Trainer.rooms.json` in
+  `scripts\` next to the Fusion Fix. L3 + R3 opens it: inventory editor,
+  health, infinite ammo and health, quick save and load without ink ribbons,
+  save anywhere, room jump, no Crimson Heads. It is written for this GOG
+  build, whose code matches the Steam executable before the September 2026
+  patch (eleval's BhdTool addresses apply byte for byte); mods made for the
+  patched Steam build do not.
+
+Two things we learnt on the way: the game starts in English and the language
+is set in its own Options menu (stored in its system data, not in
+`config.ini`); and the console's loader matches file names exactly, so a DLL
+installed as `WMASF.dll` is not found when the import says `wmasf.dll`, which
+is why the recipe lower-cases what the Windows Media installer drops.
 
 ## Benchmark sources
 
