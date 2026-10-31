@@ -1,0 +1,162 @@
+# Resident Evil HD REMASTER (GOG, build 85280) with ThirteenAG's Resident
+# Evil Fusion Fix, for Prospero Win, in Lutris's installer format.
+#
+# There is no installer to run: give the recipe the game's installed GOG
+# folder (the one holding bhd.exe and nativePC, about 18 GB). It is copied
+# into C:\Games\REHDRemaster of a prefix of its own. bhd.exe is a 32-bit
+# (PE32) Direct3D 9 program; it reads the DualSense through XInput 1.3 and
+# imports dinput8.dll and d3dx9_43.dll directly. GOG's build is DRM-free:
+# its steam_api.dll and Galaxy.dll are GOG's own and need no client.
+#
+# Fusion Fix (WidescreenFixesPack, release tag "re1", archive of
+# 2026-09-28) unlocks the resolution list, skips door animations, lifts
+# the frame rate cap (the game's FRAME RATE option must be VARIABLE as
+# well), hides the mouse cursor and can turn the noise filter and colour
+# correction off. Its archive holds the Ultimate ASI Loader as dinput8.dll and the
+# plugin in scripts\; the dinput8=n,b override makes Wine load it. The
+# plugin assembles shaders with D3DXAssembleShader from d3dx9_43.dll, so
+# Microsoft's DLL is installed with winetricks and overridden to native, as
+# GTA IV's FusionFix needs on the console (see the README).
+#
+# Every cutscene is a WMV file (VC-1 video, nativePC\movie, 6 GB) that the
+# game plays through WMVCore. Wine's own wmvcore, wmasf and the WMV/WMA
+# decoder DMOs are built on winegstreamer, and the console's Wine has no
+# GStreamer: the game froze on a black screen after the Capcom logo. The
+# recipe installs Microsoft's Windows Media runtime with winetricks wmp11
+# (the 32-bit DLLs land in syswow64: wmvcore, WMASF, wmvdecod, wmadmod...,
+# with gdiplus and the Windows Script Host it depends on) and overrides
+# them to native, decoders included. Tested on the PC with winegstreamer
+# disabled: the opening movie plays.
+#
+# The game's settings are config.ini in the user profile's AppData\Local\
+# CAPCOM\Resident Evil - biohazard<0x81>@HD REMASTER (the game names the
+# folder in Shift-JIS, with an ideographic space; Wine's code page keeps the
+# two bytes 81 40 as U+0081 and '@'). The recipe writes it so the console
+# starts at 1920x1080, full screen, at the game's variable (60 fps) frame
+# rate instead of 1280x720 windowed at 30 fps; the game rewrites it on exit.
+# Saves go to GOG Galaxy's storage folder in AppData\Local, in the prefix.
+#
+# ReShade 6.7.3 draws Riujy's BetterRE preset over the game (Nexus Mods,
+# "BetterRE Reshade": give its .7z with --file preset=). pw_install puts the
+# official ReShade build in as d3d9.dll, over DXVK's, with Microsoft's
+# D3DCompiler_47 and a ReShade.ini for the console (only the preset's effects
+# are compiled, compiled shaders are kept in reshade-cache\ beside bhd.exe,
+# no update check). From the archive the recipe takes the shaders and the
+# preset, not its dinput8.dll (an older ASI loader than Fusion Fix's), d3d9.dll
+# (the same ReShade build) or ReShade.ini (it names folders on its author's
+# PC); the preset's search paths, depth settings and preprocessor definitions
+# go into reshade_config below. The search paths keep the preset's order:
+# the pack holds two copies of some effects (Clarity.fx, LiftGammaGain.fx...)
+# in different folders. One of the preset's effects, Zenteon's TurboGI, is
+# not in the archive (ReShade's own installer downloads it); the recipe
+# fetches it from its author's repository at a pinned commit.
+# Run the game once on the PC before pushing, so reshade-cache\ is filled
+# and the console has nothing to compile; L1+R1+Options opens ReShade's
+# overlay, which the game also sees the buttons of.
+name: "Resident Evil HD REMASTER"
+game_slug: resident-evil-hd-remaster
+version: GOG 85280 + Fusion Fix (Prospero Win)
+slug: resident-evil-hd-remaster-prospero-win
+runner: wine
+prospero:
+  name: Resident Evil HD Remaster
+  graphics: dxvk
+  display: {desktop: 1920x1080}
+  input: {mode: xinput}
+script:
+  game:
+    exe: drive_c/Games/REHDRemaster/bhd.exe
+    prefix: $GAMEDIR
+  files:
+  - game: "N/A:Select the installed Resident Evil HD REMASTER folder (it holds bhd.exe and nativePC)"
+  # The release's asset is replaced in place when the fix is updated; the
+  # hash is the 2026-09-28 archive's (7102164 bytes). If it no longer
+  # matches, download the current one and give it with --file fusionfix=.
+  - fusionfix:
+      url: https://github.com/ThirteenAG/WidescreenFixesPack/releases/download/re1/ResidentEvil.FusionFix.zip
+      filename: ResidentEvil.FusionFix-2026-09-28.zip
+      sha256: 6610e5ae9a1b242dc4c19dd46d97dfd0464a7f04eebac6c0026a967a6b0218e1
+  - preset: "N/A:Select the BetterRE Reshade archive from Nexus Mods (BetterRE Reshade-191-1-1-1775056881.7z)"
+  - turbogi:
+      url: https://raw.githubusercontent.com/Zenteon/ZenteonFX/9fe75bdbaddc84ea5aab5d58fee83a2b9659f771/Shaders/Zenteon_TurboGI.fx
+      filename: Zenteon_TurboGI.fx
+      sha256: 4b7a55fe41c3e2d19c41e9674ced60a923f3655f3e9bf34a1bbb67d8c93aa54d
+  wine:
+    dxvk: true
+    dxvk_version: "2.6.2-prospero2"
+    overrides:
+      # Native first, so the Ultimate ASI Loader (dinput8.dll in the game's
+      # folder) loads; Wine's own dinput8 if it is ever removed.
+      dinput8: n,b
+      # Microsoft's d3dx9_43 (winetricks below), for the plugin's shaders.
+      d3dx9_43: n
+      # Microsoft's shader compiler (winetricks below): ReShade compiles its
+      # effects with it if you add ReShade to the prefix (README); unused
+      # otherwise.
+      d3dcompiler_47: n
+      # Microsoft's Windows Media runtime (winetricks wmp11 below) for the
+      # WMV cutscenes; winetricks sets wmvcore, wmasf and mfplat itself, the
+      # decoder DMOs are ours.
+      wmvcore: n
+      wmasf: n
+      wmvdecod: n
+      wmadmod: n
+      wmspdmod: n
+    reshade: true
+    reshade_version: "6.7.3"
+    reshade_api: d3d9
+    reshade_config:
+      GENERAL:
+        PresetPath: .\BetterRE by Riujy.ini
+        EffectSearchPaths: .\reshade-shaders\Shaders\,.\reshade-shaders\Shaders\OtisFX,.\reshade-shaders\Shaders\Depth3D,.\reshade-shaders\Shaders\FXShaders,.\reshade-shaders\Shaders\Daodan,.\reshade-shaders\Shaders\brussell,.\reshade-shaders\Shaders\Fubax,.\reshade-shaders\Shaders\DH,.\reshade-shaders\Shaders\Warp-FX,.\reshade-shaders\Shaders\CorgiFX,.\reshade-shaders\Shaders\Insane-Shaders,.\reshade-shaders\Shaders\CobraFX,.\reshade-shaders\Shaders\CRT-Royale,.\reshade-shaders\Shaders\RSRetroArch,.\reshade-shaders\Shaders\VRToolkit,.\reshade-shaders\Shaders\FGFX,.\reshade-shaders\Shaders\CShade,.\reshade-shaders\Shaders\ReShade_HDR_shaders,.\reshade-shaders\Shaders\iMMERSE,.\reshade-shaders\Shaders\vort_Shaders,.\reshade-shaders\Shaders\BX-Shade,.\reshade-shaders\Shaders\SHADERDECK,.\reshade-shaders\Shaders\METEOR,.\reshade-shaders\Shaders\Ann-ReShade,.\reshade-shaders\Shaders,.\reshade-shaders\Shaders\ZenteonFX,.\reshade-shaders\Shaders\GShade-Shaders,.\reshade-shaders\Shaders\Ptho-FX,.\reshade-shaders\Shaders\potatoFX,.\reshade-shaders\Shaders\Anagrama,.\reshade-shaders\Shaders\MaxG3D,.\reshade-shaders\Shaders\Barbatos,.\reshade-shaders\Shaders\smolbbsoop,.\reshade-shaders\Shaders\BFBFX,.\reshade-shaders\Shaders\Rendepth,.\reshade-shaders\Shaders\CropResize,.\reshade-shaders\Shaders\LumeniteFX
+        TextureSearchPaths: .\reshade-shaders\Textures\,.\reshade-shaders\Textures,.\reshade-shaders\Textures\OtisFX,.\reshade-shaders\Textures\Depth3D,.\reshade-shaders\Textures\FXShaders,.\reshade-shaders\Textures\Daodan,.\reshade-shaders\Textures\brussell,.\reshade-shaders\Textures\Fubax,.\reshade-shaders\Textures\DH,.\reshade-shaders\Textures\PD80,.\reshade-shaders\Textures\CorgiFX,.\reshade-shaders\Textures\Insane-Shaders,.\reshade-shaders\Textures\CobraFX,.\reshade-shaders\Textures\AstrayFX,.\reshade-shaders\Textures\RSRetroArch,.\reshade-shaders\Textures\VRToolkit,.\reshade-shaders\Textures\ReShade_HDR_shaders,.\reshade-shaders\Textures\iMMERSE,.\reshade-shaders\Textures\vort_Shaders,.\reshade-shaders\Textures\BX-Shade,.\reshade-shaders\Textures\SHADERDECK,.\reshade-shaders\Textures\METEOR,.\reshade-shaders\Textures\Ann-ReShade,.\reshade-shaders\Textures\ZenteonFX,.\reshade-shaders\Textures\GShade-Shaders,.\reshade-shaders\Textures\Ptho-FX,.\reshade-shaders\Textures\potatoFX,.\reshade-shaders\Textures\Anagrama,.\reshade-shaders\Textures\MaxG3D,.\reshade-shaders\Textures\Barbatos,.\reshade-shaders\Textures\smolbbsoop,.\reshade-shaders\Textures\Rendepth,.\reshade-shaders\Textures\CropResize,.\reshade-shaders\Textures\LumeniteFX
+        PreprocessorDefinitions: RESHADE_DEPTH_LINEARIZATION_FAR_PLANE=1000.0,RESHADE_DEPTH_INPUT_IS_UPSIDE_DOWN=0,RESHADE_DEPTH_INPUT_IS_REVERSED=1,RESHADE_DEPTH_INPUT_IS_LOGARITHMIC=0
+      DEPTH: {DepthCopyAtClearIndex: 2, DepthCopyBeforeClears: 1, UseAspectRatioHeuristics: 1}
+  installer:
+  - task: {name: create_prefix, prefix: $GAMEDIR, arch: win32}
+  - copy: {src: game, dst: $GAMEDIR/drive_c/Games/REHDRemaster}
+  - task: {name: winetricks, app: d3dx9_43, prefix: $GAMEDIR}
+  - task: {name: winetricks, app: d3dcompiler_47, prefix: $GAMEDIR}
+  - task: {name: winetricks, app: wmp11, prefix: $GAMEDIR}
+  - execute:
+      command: cd "$GAMEDIR/drive_c/windows" && for d in syswow64 system32; do for f in "$d"/*.dll "$d"/*.DLL "$d"/*.acm; do [ -e "$f" ] || continue; l=$(printf %s "$f" | tr A-Z a-z); [ "$f" = "$l" ] || [ -e "$l" ] || mv "$f" "$l"; done; done
+  - extract: {file: fusionfix, dst: $GAMEDIR/drive_c/Games/REHDRemaster}
+  - extract: {file: preset, dst: $CACHE/betterre}
+  - copy: {src: "$CACHE/betterre/BetterRE Reshade/reshade-shaders", dst: $GAMEDIR/drive_c/Games/REHDRemaster/reshade-shaders}
+  - copy: {src: "$CACHE/betterre/BetterRE Reshade/BetterRE by Riujy.ini", dst: $GAMEDIR/drive_c/Games/REHDRemaster}
+  - copy: {src: turbogi, dst: $GAMEDIR/drive_c/Games/REHDRemaster/reshade-shaders/Shaders/ZenteonFX}
+  # The fix's settings for the console, played with the DualSense: the
+  # frame rate cap lifted (with the game's FRAME RATE at VARIABLE, below,
+  # the console's 60 Hz vsync sets the pace; the game runs at 30 fps
+  # otherwise), the mouse cursor hidden as soon as it is still (0 would
+  # turn the hiding off), door animations skipped, the game's own full
+  # screen instead of a borderless window, no Logitech lighting, and the
+  # noise filter and colour correction off, as the fix's replacement pixel
+  # shaders (assembled through the native d3dx9_43) allow. Fog stays.
+  - write_file:
+      file: $GAMEDIR/drive_c/Games/REHDRemaster/scripts/ResidentEvil.FusionFix.ini
+      content: |
+        [MAIN]
+        UnlockAllResolutions = 1
+        UnlockFPS = 1
+        HideMouseCursorAfterMs = 1
+        DoorSkip = 1
+        BorderlessWindowed = 0
+        LightSyncRGB = 0
+        DisableNoise = 1
+        DisableColorCorrection = 1
+        DisableFog = 0
+        DisableCreateQuery = 0
+  - write_file:
+      file: "$GAMEDIR/drive_c/users/prospero/AppData/Local/CAPCOM/Resident Evil - biohazard\x81@HD REMASTER/config.ini"
+      content: |
+        [GRAPHICS]
+        AltAntiAlias=FXAA
+        TextureDetail=HIGHEST
+        ShadowQuality=HIGH
+        [DISPLAY]
+        Resolution=1920x1080
+        RefreshRate=60.00Hz
+        FullScreen=ON
+        VSYNC=ON
+        FrameRate=VARIABLE
