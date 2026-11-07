@@ -1,4 +1,5 @@
 ; Left 4 Dead 2 Steam install
+; The prefix registers .vpk files to open with bin/addoninstaller.exe via /register.
 [application]
 id = left-4-dead-2
 name = Left 4 Dead 2
