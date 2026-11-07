@@ -1,0 +1,19 @@
+; Left 4 Dead 2 keyboard and mouse mapping
+[input]
+mode = keyboard
+mouse = right_stick
+mouse_speed = 1200
+up = w
+down = s
+left = a
+right = d
+cross = space
+circle = ctrl
+square = r
+triangle = e
+l1 = shift
+r1 = q
+l2 = mouse_right
+r2 = mouse_left
+options = escape
+touchpad = mouse_left
