@@ -1,0 +1,47 @@
+# Changed exe from FalloutLauncher.exe to Fallout3.exe as the launcher does
+# not start Fallout3.exe successfully.
+# Need to specify gogsetup as filepath to setup exe.
+description: 'Play "Fallout 3: GOTY" provided by GOG on Linux!'
+game_slug: fallout-3-game-of-the-year-edition
+gogslug: fallout_3_game_of_the_year_edition
+humblestoreid: fallout-3-game-of-the-year-edition
+installer_slug: fallout-3-game-of-the-year-ed-gog
+name: 'Fallout 3: Game of the Year Edition'
+notes: ''
+runner: wine
+script:
+  files:
+  - gogsetup: N/A:Please select installer exe from GOG
+  game:
+    arch: win64
+    exe: drive_c/GOG Games/Fallout 3/FalloutLauncher.exe
+    prefix: $GAMEDIR
+  installer:
+  - task:
+      arch: win64
+      description: Creating 64-bit Wine prefix
+      name: create_prefix
+      prefix: $GAMEDIR
+  - task:
+      executable: gogsetup
+      name: wineexec
+  - task:
+      app: lavfilters
+      description: Installing LAV Filters to fix MPEG-I Stream Splitter loop
+      name: winetricks
+      prefix: $GAMEDIR
+  system:
+    env:
+      DXVK_FRAME_RATE: 60
+      DXVK_HUD: null
+
+prospero:
+  name: Fallout 3 GOTY
+  graphics: dxvk
+  display:
+    desktop: 1920x1080
+
+slug: fallout-3-game-of-the-year-ed-gog
+steamid: 22370
+version: GOG
+year: 2009
